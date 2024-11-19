@@ -68,6 +68,9 @@ public class Partenaire implements Serializable{
     
     private int id;
     private String refPartenaire;
+    private String Pays;
+    private String Nom;
+    private String Ville;
 
     /**
      * création d'un nouveau Partenaire en mémoire, non existant dans la Base de
@@ -87,11 +90,15 @@ public class Partenaire implements Serializable{
     public Partenaire(int id, String refPartenaire) {
         this.id = id;
         this.refPartenaire = refPartenaire;
+        this.Pays = Pays;
+        this.Nom = Nom;
+        this.Ville=Ville;
     }
 
     @Override
     public String toString() {
-        return "Partenaire{" + "id =" + this.getId() + " ; refPartenaire=" + refPartenaire + '}';
+        //return "Partenaire{" + "id =" + this.getId() + " ; refPartenaire=" + refPartenaire + '}';
+        return "Partenaire{" + "id =" + this.getId() + " ; refPartenaire=" + refPartenaire + '}' +Pays +Nom +Ville;
     }
 
     /**
