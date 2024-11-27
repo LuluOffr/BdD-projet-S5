@@ -99,5 +99,82 @@ public class Candidature implements Serializable {
             while (rs.next()) {
                 res.add(new Candidature(
                         rs.getInt(1),
-     
+                        rs.getString(2),
+                        rs.getString(3),
+                        rs.getDate(4),
+                        rs.getInt(5)
+                ));
+            }
+            return res;
+        }
+    }
 
+    public static Optional<Candidature> trouveCandidature(Connection con, String ine) throws SQLException {
+        try (PreparedStatement pst = con.prepareStatement(
+                "SELECT id, ine, idOffreMobilite, date, ordre FROM candidature WHERE ine = ?")) {
+            pst.setString(1, ine);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                return Optional.of(new Candidature(
+                        rs.getInt(1),
+                        rs.getString(2),
+                        rs.getString(3),
+                        rs.getDate(4),
+                        rs.getInt(5)
+                ));
+            } else {
+                return Optional.empty();
+            }
+        }
+    }
+
+    public static int creeConsole(Connection con) throws SQLException {
+        String ine = ConsoleFdB.entreeString("INE : ");
+        String idOffreMobilite = ConsoleFdB.entreeString("ID Offre Mobilité : ");
+        java.sql.Date date = java.sql.Date.valueOf(ConsoleFdB.entreeString("Date (YYYY-MM-DD) : "));
+        int ordre = ConsoleFdB.entreeInt("Ordre : ");
+        Candidature nouvelle = new Candidature(ine, idOffreMobilite, date, ordre);
+        return nouvelle.saveInDB(con);
+    }
+
+    public static Candidature selectInConsole(Connection con) throws SQLException {
+        return ListUtils.selectOne("Choisissez une candidature :",
+                toutesLesCandidatures(con), (elem) -> elem.getIne());
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public String getIne() {
+        return ine;
+    }
+
+    public void setIne(String ine) {
+        this.ine = ine;
+    }
+
+    public String getIdOffreMobilite() {
+        return idOffreMobilite;
+    }
+
+    public void setIdOffreMobilite(String idOffreMobilite) {
+        this.idOffreMobilite = idOffreMobilite;
+    }
+
+    public java.sql.Date getDate() {
+        return date;
+    }
+
+    public void setDate(java.sql.Date date) {
+        this.date = date;
+    }
+
+    public int getOrdre() {
+        return ordre;
+    }
+
+    public void setOrdre(int ordre) {
+        this.ordre = ordre;
+    }
+}
