@@ -78,8 +78,8 @@ public class Partenaire implements Serializable{
      *
      * @param refPartenaire
      */
-    public Partenaire(String refPartenaire) {
-        this(-1,refPartenaire);
+    public Partenaire(String refPartenaire, String Pays, String Nom, String Ville) {
+        this(-1, refPartenaire, Pays, Nom, Ville);
     }
 
     /**
@@ -87,7 +87,7 @@ public class Partenaire implements Serializable{
      *
      * @param refPartenaire
      */
-    public Partenaire(int id, String refPartenaire) {
+    public Partenaire(int id, String refPartenaire, String Pays, String Nom, String Ville) {
         this.id = id;
         this.refPartenaire = refPartenaire;
         this.Pays = Pays;
@@ -98,7 +98,7 @@ public class Partenaire implements Serializable{
     @Override
     public String toString() {
         //return "Partenaire{" + "id =" + this.getId() + " ; refPartenaire=" + refPartenaire + '}';
-        return "Partenaire{" + "id =" + this.getId() + " ; refPartenaire=" + refPartenaire + '}' +Pays +Nom +Ville;
+        return "Partenaire{" + "id =" + this.getId() + " ;refPartenaire=" + refPartenaire + " ;Pays= " + Pays + ";Nom =" +Nom + ";Pays="+ Ville +'}';
     }
 
     /**
@@ -121,6 +121,9 @@ public class Partenaire implements Serializable{
                 "insert into partenaire (refPartenaire) values (?)",
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
             insert.setString(1, this.getRefPartenaire());
+            insert.setString(2, this.getPays());
+            insert.setString(3, this.getNom());
+            insert.setString(4, this.getVille());
             insert.executeUpdate();
             try (ResultSet rid = insert.getGeneratedKeys()) {
                 rid.next();
@@ -131,39 +134,42 @@ public class Partenaire implements Serializable{
     }
 
     public static List<Partenaire> tousLesPartaires(Connection con) throws SQLException {
-        try (PreparedStatement pst = con.prepareStatement(
-                "select id,refPartenaire from partenaire")) {
-            ResultSet rs = pst.executeQuery();
-            List<Partenaire> res = new ArrayList<>();
-            while (rs.next()) {
-                res.add(new Partenaire(rs.getInt(1), rs.getString(2)));
-            }
-            return res;
+    try (PreparedStatement pst = con.prepareStatement("SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire")) {
+        ResultSet rs = pst.executeQuery();
+        List<Partenaire> res = new ArrayList<>();
+        while (rs.next()) {
+            res.add(new Partenaire(rs.getInt("id"),rs.getString("refPartenaire"), rs.getString("Pays"),rs.getString("Nom"),rs.getString("Ville")));
+        }
+        return res;
+    }
+}
+public static Optional<Partenaire> trouvePartaire(Connection con, String refPart) throws SQLException {
+    try (PreparedStatement pst = con.prepareStatement(
+            "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire WHERE refPartenaire = ?")) {
+        pst.setString(1, refPart);
+        ResultSet rs = pst.executeQuery();
+        if (rs.next()) {
+            return Optional.of(new Partenaire(
+                    rs.getInt("id"),
+                    rs.getString("refPartenaire"),
+                    rs.getString("Pays"),
+                    rs.getString("Nom"),
+                    rs.getString("Ville")
+            ));
+        } else {
+            return Optional.empty();
         }
     }
+}
 
-    public static Optional<Partenaire> trouvePartaire(Connection con,
-            String refPart) throws SQLException {
-        try (PreparedStatement pst = con.prepareStatement(
-                "select id,refPartenaire from partenaire"
-                + "  where refPartenaire = ?")) {
-            pst.setString(1, refPart);
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                return Optional.of(new Partenaire(rs.getInt(1),
-                        rs.getString(2)));
-            } else {
-                return Optional.empty();
-            }
-        }
-    }
-
-    public static int creeConsole(Connection con) throws SQLException {
-        String idP = ConsoleFdB.entreeString("refPartenaire : ");
-        Partenaire nouveau = new Partenaire(idP);
-        return nouveau.saveInDB(con);
-    }
-
+public static int creeConsole(Connection con) throws SQLException {
+    String refPartenaire = ConsoleFdB.entreeString("refPartenaire : ");
+    String Pays = ConsoleFdB.entreeString("Pays : ");
+    String Nom = ConsoleFdB.entreeString("Nom : ");
+    String Ville = ConsoleFdB.entreeString("Ville : ");
+    Partenaire nouveau = new Partenaire(refPartenaire, Pays, Nom, Ville);
+    return nouveau.saveInDB(con);
+}
     public static Partenaire selectInConsole(Connection con) throws SQLException {
         return ListUtils.selectOne("choisissez un partenaire :",
                 tousLesPartaires(con), (elem) -> elem.getRefPartenaire());
@@ -183,6 +189,30 @@ public class Partenaire implements Serializable{
         this.refPartenaire = refPartenaire;
     }
 
+    public String getPays() {
+    return Pays;
+}
+
+public void setPays(String Pays) {
+    this.Pays = Pays;
+}
+
+public String getNom() {
+    return Nom;
+}
+
+public void setNom(String Nom) {
+    this.Nom = Nom;
+}
+
+public String getVille() {
+    return Ville;
+}
+
+public void setVille(String Ville) {
+    this.Ville = Ville;
+}
+    
     /**
      * @return the id
      */

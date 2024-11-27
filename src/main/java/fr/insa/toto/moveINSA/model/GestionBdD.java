@@ -118,8 +118,8 @@ public class GestionBdD {
      */
     public static void initBdDTest(Connection con) throws SQLException {
         List<Partenaire> partenaires = List.of(
-                new Partenaire("MIT"),
-                new Partenaire("Oxford")
+             new Partenaire("MIT", "USA", "Massachusetts Institute of Technology", "Cambridge"),
+            new Partenaire("Oxford", "UK", "University of Oxford", "Oxford")
         );
         for (var p : partenaires) {
             p.saveInDB(con);
