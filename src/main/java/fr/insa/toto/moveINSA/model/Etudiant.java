@@ -8,6 +8,8 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import fr.insa.beuvron.utils.ConsoleFdB;
+import fr.insa.beuvron.utils.list.ListUtils;
 
 public class Etudiant implements Serializable {
 
@@ -97,6 +99,24 @@ public class Etudiant implements Serializable {
         }
         return Optional.empty();
     }
+    
+    
+    
+    
+    public static int creeConsole(Connection con) throws SQLException {
+        String ine = ConsoleFdB.entreeString("INE : ");
+        String nom = ConsoleFdB.entreeString("Nom : ");
+        String prenom = ConsoleFdB.entreeString("Prenom : ");
+        String classe = ConsoleFdB.entreeString("Classe : ");
+        String score = ConsoleFdB.entreeString("Score : ");
+        Etudiant nouveau = new Etudiant(ine, nom, prenom, classe, score);
+        return nouveau.saveInDB(con);
+    }
+
+    public static Etudiant selectInConsole(Connection con) throws SQLException {
+        return ListUtils.selectOne("Choisissez un étudiant :", 
+                tousLesEtudiants(con), (elem) -> elem.getNom() + " " + elem.getPrenom());
+    }
 
     // Méthodes Getters et Setters
     public int getId() {
@@ -154,6 +174,9 @@ public class Etudiant implements Serializable {
                 ", score='" + score + '\'' +
                 '}';
     }
+    
+    
+    
 }
 
      

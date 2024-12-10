@@ -225,6 +225,32 @@ public class GestionBdD {
         }
     }
 
+        public static void menuEtudiant(Connection con) {
+        int rep = -1;
+        while (rep != 0) {
+            int i = 1;
+            System.out.println("Menu Etudiant");
+            System.out.println("==================");
+            System.out.println((i++) + ") liste de tous les étudiants");
+            System.out.println((i++) + ") créer un nouveau profil;");
+            System.out.println("0) Retour");
+            rep = ConsoleFdB.entreeEntier("Votre choix : ");
+            try {
+                int j = 1;
+                if (rep == j++) {
+                    List<Etudiant> users = Etudiant.tousLesEtudiants(con);
+                    System.out.println(users.size() + " utilisateurs : ");
+                    System.out.println(ListUtils.enumerateList(users, (elem) -> elem.toString()));
+                } else if (rep == j++) {
+                    Etudiant.creeConsole(con);
+                }
+            } catch (Exception ex) {
+                System.out.println(ExceptionsUtils.messageEtPremiersAppelsDansPackage(ex, "fr.insa", 3));
+            }
+        }
+    }
+    
+    
     public static void menuPrincipal() {
         int rep = -1;
         Connection con = null;
@@ -243,6 +269,8 @@ public class GestionBdD {
             System.out.println((i++) + ") menu gestion BdD");
             System.out.println((i++) + ") menu partenaires");
             System.out.println((i++) + ") menu offres");
+            System.out.println((i++) + ") menu Etudiant");
+            System.out.println((i++) + ") menu Candidature");
             System.out.println("0) Fin");
             rep = ConsoleFdB.entreeEntier("Votre choix : ");
             try {
