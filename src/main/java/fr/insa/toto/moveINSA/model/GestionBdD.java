@@ -31,6 +31,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
 import org.h2.jdbc.meta.DatabaseMetaServer;
+import java.util.Optional;
 
 /**
  * Opération générales sur la base de donnée de gestion des tournois.
@@ -225,31 +226,90 @@ public class GestionBdD {
         }
     }
 
-        public static void menuEtudiant(Connection con) {
-        int rep = -1;
-        while (rep != 0) {
-            int i = 1;
-            System.out.println("Menu Etudiant");
-            System.out.println("==================");
-            System.out.println((i++) + ") liste de tous les étudiants");
-            System.out.println((i++) + ") créer un nouveau profil;");
-            System.out.println("0) Retour");
-            rep = ConsoleFdB.entreeEntier("Votre choix : ");
-            try {
-                int j = 1;
-                if (rep == j++) {
-                    List<Etudiant> users = Etudiant.tousLesEtudiants(con);
-                    System.out.println(users.size() + " utilisateurs : ");
-                    System.out.println(ListUtils.enumerateList(users, (elem) -> elem.toString()));
-                } else if (rep == j++) {
-                    Etudiant.creeConsole(con);
+public static void menuEtudiant(Connection con) {
+    int rep = -1;
+    while (rep != 0) {
+        int i = 1;
+        System.out.println("Menu Étudiant");
+        System.out.println("==================");
+        System.out.println((i++) + ") Liste de tous les étudiants");
+        System.out.println((i++) + ") Créer un nouveau profil");
+        System.out.println((i++) + ") Rechercher un étudiant par INE");
+        System.out.println("0) Retour");
+        rep = ConsoleFdB.entreeEntier("Votre choix : ");
+        try {
+            int j = 1;
+            if (rep == j++) {
+                // Liste de tous les étudiants
+                List<Etudiant> etudiants = Etudiant.tousLesEtudiants(con);
+                if (etudiants.isEmpty()) {
+                    System.out.println("Aucun étudiant trouvé.");
+                } else {
+                    System.out.println(etudiants.size() + " étudiants : ");
+                    System.out.println(ListUtils.enumerateList(etudiants, (elem) -> elem.toString()));
                 }
-            } catch (Exception ex) {
-                System.out.println(ExceptionsUtils.messageEtPremiersAppelsDansPackage(ex, "fr.insa", 3));
+            } else if (rep == j++) {
+                // Créer un nouvel étudiant
+                int id = Etudiant.creeConsole(con);
+                System.out.println("Étudiant créé avec l'ID : " + id);
+            } else if (rep == j++) {
+                // Rechercher un étudiant par INE
+                String ine = ConsoleFdB.entreeString("INE de l'étudiant : ");
+                Optional<Etudiant> etu = Etudiant.trouveEtudiant(con, ine);
+                if (etu.isPresent()) {
+                    System.out.println("Étudiant trouvé : " + etu.get());
+                } else {
+                    System.out.println("Aucun étudiant trouvé avec cet INE.");
+                }
             }
+        } catch (Exception ex) {
+            System.out.println(ExceptionsUtils.messageEtPremiersAppelsDansPackage(ex, "fr.insa", 3));
         }
     }
-    
+}
+
+public static void menuCandidature(Connection con) {
+    int rep = -1;
+    while (rep != 0) {
+        int i = 1;
+        System.out.println("Menu Candidatures");
+        System.out.println("==================");
+        System.out.println((i++) + ") Liste de toutes les candidatures");
+        System.out.println((i++) + ") Créer une nouvelle candidature");
+        System.out.println((i++) + ") Rechercher une candidature par INE");
+        System.out.println("0) Retour");
+        rep = ConsoleFdB.entreeEntier("Votre choix : ");
+        try {
+            int j = 1;
+            if (rep == j++) {
+                // Liste de toutes les candidatures
+                List<Candidature> candidatures = Candidature.toutesLesCandidatures(con);
+                if (candidatures.isEmpty()) {
+                    System.out.println("Aucune candidature trouvée.");
+                } else {
+                    System.out.println(candidatures.size() + " candidatures : ");
+                    System.out.println(ListUtils.enumerateList(candidatures, (elem) -> elem.toString()));
+                }
+            } else if (rep == j++) {
+                // Créer une nouvelle candidature
+                int id = Candidature.creeConsole(con);
+                System.out.println("Candidature créée avec l'ID : " + id);
+            } else if (rep == j++) {
+                // Rechercher une candidature par INE
+                String ine = ConsoleFdB.entreeString("INE de la candidature : ");
+                Optional<Candidature> cand = Candidature.trouveCandidature(con, ine);
+                if (cand.isPresent()) {
+                    System.out.println("Candidature trouvée : " + cand.get());
+                } else {
+                    System.out.println("Aucune candidature trouvée pour cet INE.");
+                }
+            }
+        } catch (Exception ex) {
+            System.out.println(ExceptionsUtils.messageEtPremiersAppelsDansPackage(ex, "fr.insa", 3));
+        }
+    }
+}
+          
     
     public static void menuPrincipal() {
         int rep = -1;
@@ -289,7 +349,12 @@ public class GestionBdD {
                     menuPartenaire(con);
                 } else if (rep == j++) {
                     menuOffre(con);
+                } else if (rep == j++) {
+                    menuEtudiant(con);
+                } else if (rep == j++) {
+                    menuCandidature(con);
                 }
+                
             } catch (Exception ex) {
                 System.out.println(ExceptionsUtils.messageEtPremiersAppelsDansPackage(ex, "fr.insa", 3));
             }
