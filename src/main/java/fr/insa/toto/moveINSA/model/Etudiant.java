@@ -18,12 +18,23 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.toto.moveINSA.model;
 
+import fr.insa.beuvron.utils.ConsoleFdB;
+import fr.insa.beuvron.utils.list.ListUtils;
+import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 /**
  *
  * @author lucas
  */
 public class Etudiant {
     
+     private int id;
      private String ine;
      private String nom;
      private String prenom;
@@ -40,6 +51,25 @@ public class Etudiant {
     return "Etudiant{" + "nom=" + nom + " ; prenom=" + prenom + '}';
 }
 
+public int saveInDB(Connection con) throws SQLException {
+        if (this.id != -1) {
+            throw new EntiteDejaSauvegardee();
+        }
+        try (PreparedStatement insert = con.prepareStatement(
+                "INSERT INTO Etudiant (ine, nom, prenom) VALUES (?, ?, ?)",
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
+            insert.setString(1, this.ine);
+            insert.setString(2, this.prenom);
+            insert.setString(3, this.nom);
+            insert.executeUpdate();
+            try (ResultSet rid = insert.getGeneratedKeys()) {
+                if (rid.next()) {
+                    this.id = rid.getInt(1);
+                }
+                return this.id;
+            }
+        }
+    }
          
          
     
