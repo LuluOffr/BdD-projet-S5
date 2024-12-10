@@ -13,12 +13,13 @@ public class Etudiant implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    // Attributs
     private int id;
     private String ine;
     private String nom;
-    private String prenom;
-    private String classe;
-    private String score; // Modifié de double à String
+    private String prenom; // Correction : "prenom" commence par une minuscule
+    private String classe; // Correction : "classe" commence par une minuscule
+    private String score;  // Correction : "score" commence par une minuscule
 
     // Constructeurs
     public Etudiant(String ine, String nom, String prenom, String classe, String score) {
@@ -46,7 +47,7 @@ public class Etudiant implements Serializable {
             insert.setString(2, this.nom);
             insert.setString(3, this.prenom);
             insert.setString(4, this.classe);
-            insert.setString(5, this.score); // Modifié pour utiliser setString
+            insert.setString(5, this.score);
             insert.executeUpdate();
 
             try (ResultSet rs = insert.getGeneratedKeys()) {
@@ -70,7 +71,7 @@ public class Etudiant implements Serializable {
                         rs.getString("nom"),
                         rs.getString("prenom"),
                         rs.getString("classe"),
-                        rs.getString("score") // Modifié pour récupérer une chaîne
+                        rs.getString("score")
                 ));
             }
             return etudiants;
@@ -89,7 +90,7 @@ public class Etudiant implements Serializable {
                             rs.getString("nom"),
                             rs.getString("prenom"),
                             rs.getString("classe"),
-                            rs.getString("score") // Modifié pour récupérer une chaîne
+                            rs.getString("score")
                     ));
                 }
             }
@@ -134,11 +135,11 @@ public class Etudiant implements Serializable {
         this.classe = classe;
     }
 
-    public String getScore() { // Modifié pour retourner une chaîne
+    public String getScore() {
         return score;
     }
 
-    public void setScore(String score) { // Modifié pour accepter une chaîne
+    public void setScore(String score) {
         this.score = score;
     }
 
