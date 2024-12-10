@@ -25,8 +25,8 @@ public class Candidature implements Serializable {
 
     private int id;
     private String ine;
-    private String idOffreMobilite;
-    private java.sql.Date date;
+    private String idOffreMobilité;
+    private java.sql.Date Date;
     private int ordre;
 
     /**
@@ -34,12 +34,12 @@ public class Candidature implements Serializable {
      * de données.
      *
      * @param ine
-     * @param idOffreMobilite
-     * @param date
+     * @param idOffreMobilité
+     * @param Date
      * @param ordre
      */
-    public Candidature(String ine, String idOffreMobilite, java.sql.Date date, int ordre) {
-        this(-1, ine, idOffreMobilite, date, ordre);
+    public Candidature(String ine, String idOffreMobilité, java.sql.Date Date, int ordre) {
+        this(-1, ine, idOffreMobilité, Date, ordre);
     }
 
     /**
@@ -47,15 +47,15 @@ public class Candidature implements Serializable {
      *
      * @param id
      * @param ine
-     * @param idOffreMobilite
-     * @param date
+     * @param idOffreMobilité
+     * @param Date
      * @param ordre
      */
     public Candidature(int id, String ine, String idOffreMobilite, java.sql.Date date, int ordre) {
         this.id = id;
         this.ine = ine;
-        this.idOffreMobilite = idOffreMobilite;
-        this.date = date;
+        this.idOffreMobilité = idOffreMobilité;
+        this.Date = Date;
         this.ordre = ordre;
     }
 
@@ -64,8 +64,8 @@ public class Candidature implements Serializable {
         return "Candidature{" +
                 "id=" + id +
                 ", ine='" + ine + '\'' +
-                ", idOffreMobilite='" + idOffreMobilite + '\'' +
-                ", date=" + date +
+                ", idOffreMobilité='" + idOffreMobilité + '\'' +
+                ", Date=" + Date +
                 ", ordre=" + ordre +
                 '}';
     }
@@ -75,11 +75,11 @@ public class Candidature implements Serializable {
             throw new EntiteDejaSauvegardee();
         }
         try (PreparedStatement insert = con.prepareStatement(
-                "INSERT INTO candidature (ine, idOffreMobilite, date, ordre) VALUES (?, ?, ?, ?)",
+                "INSERT INTO candidature (ine, idOffreMobilité, Date, ordre) VALUES (?, ?, ?, ?)",
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
             insert.setString(1, this.ine);
-            insert.setString(2, this.idOffreMobilite);
-            insert.setDate(3, this.date);
+            insert.setString(2, this.idOffreMobilité);
+            insert.setDate(3, this.Date);
             insert.setInt(4, this.ordre);
             insert.executeUpdate();
             try (ResultSet rid = insert.getGeneratedKeys()) {
@@ -93,7 +93,7 @@ public class Candidature implements Serializable {
 
     public static List<Candidature> toutesLesCandidatures(Connection con) throws SQLException {
         try (PreparedStatement pst = con.prepareStatement(
-                "SELECT id, ine, idOffreMobilite, date, ordre FROM candidature")) {
+                "SELECT id, ine, idOffreMobilité, Date, ordre FROM candidature")) {
             ResultSet rs = pst.executeQuery();
             List<Candidature> res = new ArrayList<>();
             while (rs.next()) {
@@ -111,7 +111,7 @@ public class Candidature implements Serializable {
 
     public static Optional<Candidature> trouveCandidature(Connection con, String ine) throws SQLException {
         try (PreparedStatement pst = con.prepareStatement(
-                "SELECT id, ine, idOffreMobilite, date, ordre FROM candidature WHERE ine = ?")) {
+                "SELECT id, ine, idOffreMobilité, Date, ordre FROM candidature WHERE ine = ?")) {
             pst.setString(1, ine);
             ResultSet rs = pst.executeQuery();
             if (rs.next()) {
@@ -154,20 +154,20 @@ public class Candidature implements Serializable {
         this.ine = ine;
     }
 
-    public String getIdOffreMobilite() {
-        return idOffreMobilite;
+    public String getIdOffreMobilité() {
+        return idOffreMobilité;
     }
 
-    public void setIdOffreMobilite(String idOffreMobilite) {
-        this.idOffreMobilite = idOffreMobilite;
+    public void setIdOffreMobilité(String idOffreMobilité) {
+        this.idOffreMobilité = idOffreMobilité;
     }
 
     public java.sql.Date getDate() {
-        return date;
+        return Date;
     }
 
     public void setDate(java.sql.Date date) {
-        this.date = date;
+        this.Date = Date;
     }
 
     public int getOrdre() {
