@@ -145,7 +145,7 @@ public class Partenaire implements Serializable{
 }
 public static Optional<Partenaire> trouvePartaire(Connection con, String refPart) throws SQLException {
     try (PreparedStatement pst = con.prepareStatement(
-            "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire WHERE refPartenaire = ?")) {
+            "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire")) {
         pst.setString(1, refPart);
         ResultSet rs = pst.executeQuery();
         if (rs.next()) {
