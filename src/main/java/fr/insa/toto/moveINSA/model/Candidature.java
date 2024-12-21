@@ -15,7 +15,7 @@ import java.util.Optional;
  * Classe "miroir" de la table candidature.
  *
  * Cette classe permet d'interfacer facilement un programme Java avec une table
- * relationnelle `candidature` dans une base de données.
+ * relationnelle candidature dans une base de données.
  * 
  * @author votre_nom
  */

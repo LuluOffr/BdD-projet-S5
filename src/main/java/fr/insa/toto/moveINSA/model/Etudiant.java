@@ -1,3 +1,4 @@
+
 package fr.insa.toto.moveINSA.model;
 
 import java.io.Serializable;
