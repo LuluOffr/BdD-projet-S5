@@ -91,42 +91,42 @@ public class Candidature implements Serializable {
         }
     }
 
-    public static List<Candidature> toutesLesCandidatures(Connection con) throws SQLException {
-        try (PreparedStatement pst = con.prepareStatement(
-                "SELECT id, ine, idOffreMobilité, Date, ordre FROM candidature")) {
-            ResultSet rs = pst.executeQuery();
-            List<Candidature> res = new ArrayList<>();
-            while (rs.next()) {
-                res.add(new Candidature(
-                        rs.getInt(1),
-                        rs.getString(2),
-                        rs.getString(3),
-                        rs.getDate(4),
-                        rs.getInt(5)
-                ));
-            }
-            return res;
+public static List<Candidature> toutesLesCandidatures(Connection con) throws SQLException {
+    try (PreparedStatement pst = con.prepareStatement(
+            "SELECT ine, idOffreMobilité, Date, ordre FROM candidature")) {
+        ResultSet rs = pst.executeQuery();
+        List<Candidature> res = new ArrayList<>();
+        while (rs.next()) {
+            res.add(new Candidature(
+                    -1, // Pas d'id
+                    rs.getString(1),
+                    rs.getString(2),
+                    rs.getDate(3),
+                    rs.getInt(4)
+            ));
         }
+        return res;
     }
+}
 
-    public static Optional<Candidature> trouveCandidature(Connection con, String ine) throws SQLException {
-        try (PreparedStatement pst = con.prepareStatement(
-                "SELECT id, ine, idOffreMobilité, Date, ordre FROM candidature WHERE ine = ?")) {
-            pst.setString(1, ine);
-            ResultSet rs = pst.executeQuery();
-            if (rs.next()) {
-                return Optional.of(new Candidature(
-                        rs.getInt(1),
-                        rs.getString(2),
-                        rs.getString(3),
-                        rs.getDate(4),
-                        rs.getInt(5)
-                ));
-            } else {
-                return Optional.empty();
-            }
+public static Optional<Candidature> trouveCandidature(Connection con, String ine) throws SQLException {
+    try (PreparedStatement pst = con.prepareStatement(
+            "SELECT ine, idOffreMobilité, Date, ordre FROM candidature WHERE ine = ?")) {
+        pst.setString(1, ine);
+        ResultSet rs = pst.executeQuery();
+        if (rs.next()) {
+            return Optional.of(new Candidature(
+                    -1, // Pas d'id
+                    rs.getString(1),
+                    rs.getString(2),
+                    rs.getDate(3),
+                    rs.getInt(4)
+            ));
+        } else {
+            return Optional.empty();
         }
     }
+}
 
     public static int creeConsole(Connection con) throws SQLException {
         String ine = ConsoleFdB.entreeString("INE : ");

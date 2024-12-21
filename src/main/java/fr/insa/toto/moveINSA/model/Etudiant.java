@@ -19,9 +19,9 @@ public class Etudiant implements Serializable {
     private int id;
     private String ine;
     private String nom;
-    private String prenom; // Correction : "prenom" commence par une minuscule
-    private String classe; // Correction : "classe" commence par une minuscule
-    private String score;  // Correction : "score" commence par une minuscule
+    private String prenom;
+    private String classe;
+    private String score;
 
     // Constructeurs
     public Etudiant(String ine, String nom, String prenom, String classe, String score) {
@@ -43,7 +43,7 @@ public class Etudiant implements Serializable {
         if (this.id != -1) {
             throw new IllegalStateException("Étudiant déjà sauvegardé.");
         }
-        String query = "INSERT INTO etudiant (ine, nom, prenom, classe, score) VALUES (?, ?, ?, ?, ?)";
+        String query = "INSERT INTO etudiant (ine, nom, Prénom, Classe, Score) VALUES (?, ?, ?, ?, ?)";
         try (PreparedStatement insert = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
             insert.setString(1, this.ine);
             insert.setString(2, this.nom);
@@ -61,14 +61,33 @@ public class Etudiant implements Serializable {
         }
     }
 
-    public static List<Etudiant> tousLesEtudiants(Connection con) throws SQLException {
-        String query = "SELECT id, ine, nom, prenom, classe, score FROM etudiant";
-        try (PreparedStatement pst = con.prepareStatement(query)) {
-            ResultSet rs = pst.executeQuery();
-            List<Etudiant> etudiants = new ArrayList<>();
-            while (rs.next()) {
-                etudiants.add(new Etudiant(
-                        rs.getInt("id"),
+public static List<Etudiant> tousLesEtudiants(Connection con) throws SQLException {
+    String query = "SELECT ine, nom, Prénom AS prenom, Classe AS classe, Score AS score FROM etudiant";
+    try (PreparedStatement pst = con.prepareStatement(query)) {
+        ResultSet rs = pst.executeQuery();
+        List<Etudiant> etudiants = new ArrayList<>();
+        while (rs.next()) {
+            etudiants.add(new Etudiant(
+                    -1, 
+                    rs.getString("ine"),
+                    rs.getString("nom"),
+                    rs.getString("prenom"),
+                    rs.getString("classe"),
+                    rs.getString("score")
+            ));
+        }
+        return etudiants;
+    }
+}
+
+public static Optional<Etudiant> trouveEtudiant(Connection con, String ine) throws SQLException {
+    String query = "SELECT ine, nom, Prénom AS prenom, Classe AS classe, Score AS score FROM etudiant WHERE ine = ?";
+    try (PreparedStatement pst = con.prepareStatement(query)) {
+        pst.setString(1, ine);
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                return Optional.of(new Etudiant(
+                        -1, //pas d'id
                         rs.getString("ine"),
                         rs.getString("nom"),
                         rs.getString("prenom"),
@@ -76,37 +95,15 @@ public class Etudiant implements Serializable {
                         rs.getString("score")
                 ));
             }
-            return etudiants;
         }
     }
+    return Optional.empty();
+}
 
-    public static Optional<Etudiant> trouveEtudiant(Connection con, String ine) throws SQLException {
-        String query = "SELECT id, ine, nom, prenom, classe, score FROM etudiant WHERE ine = ?";
-        try (PreparedStatement pst = con.prepareStatement(query)) {
-            pst.setString(1, ine);
-            try (ResultSet rs = pst.executeQuery()) {
-                if (rs.next()) {
-                    return Optional.of(new Etudiant(
-                            rs.getInt("id"),
-                            rs.getString("ine"),
-                            rs.getString("nom"),
-                            rs.getString("prenom"),
-                            rs.getString("classe"),
-                            rs.getString("score")
-                    ));
-                }
-            }
-        }
-        return Optional.empty();
-    }
-    
-    
-    
-    
     public static int creeConsole(Connection con) throws SQLException {
         String ine = ConsoleFdB.entreeString("INE : ");
         String nom = ConsoleFdB.entreeString("Nom : ");
-        String prenom = ConsoleFdB.entreeString("Prenom : ");
+        String prenom = ConsoleFdB.entreeString("Prénom : ");
         String classe = ConsoleFdB.entreeString("Classe : ");
         String score = ConsoleFdB.entreeString("Score : ");
         Etudiant nouveau = new Etudiant(ine, nom, prenom, classe, score);
@@ -174,9 +171,4 @@ public class Etudiant implements Serializable {
                 ", score='" + score + '\'' +
                 '}';
     }
-    
-    
-    
 }
-
-     
