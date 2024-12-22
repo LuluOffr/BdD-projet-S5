@@ -20,6 +20,7 @@ package fr.insa.toto.moveINSA.gui.vues;
 
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -27,21 +28,24 @@ import fr.insa.beuvron.vaadin.utils.ConnectionPool;
 import fr.insa.toto.moveINSA.gui.MainLayout;
 import fr.insa.toto.moveINSA.model.Etudiant;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
-/**
- * Panneau pour afficher la liste des étudiants
- *
- * @author lucas
- */
 @PageTitle("Liste des étudiants")
 @Route(value = "etudiants/liste", layout = MainLayout.class)
 public class EtudiantsListePanel extends VerticalLayout {
 
     public EtudiantsListePanel() {
+        this.add(new H3("Liste de tous les étudiants"));
+
         try (Connection con = ConnectionPool.getConnection()) {
-            this.add(new H3("Liste de tous les étudiants"));
+            // Vérification des tables disponibles
+            ResultSet rs = con.getMetaData().getTables(null, null, "%", null);
+            System.out.println("Tables disponibles dans la base :");
+            while (rs.next()) {
+                System.out.println(rs.getString("TABLE_NAME"));
+            }
 
             // Récupérer la liste des étudiants depuis la base de données
             List<Etudiant> etudiants = Etudiant.tousLesEtudiants(con);
@@ -62,8 +66,9 @@ public class EtudiantsListePanel extends VerticalLayout {
 
             // Ajouter le grid au panneau
             this.add(grid);
+
         } catch (SQLException ex) {
-            this.add(new H3("Erreur : Impossible de charger les étudiants."));
+            Notification.show("Erreur : Impossible de charger les étudiants. Détails : " + ex.getLocalizedMessage());
             ex.printStackTrace();
         }
     }
