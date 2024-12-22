@@ -101,15 +101,15 @@ public static Optional<Etudiant> trouveEtudiant(Connection con, String ine) thro
     return Optional.empty();
 }
 
-    public static int creeConsole(Connection con) throws SQLException {
-        String ine = ConsoleFdB.entreeString("INE : ");
-        String nom = ConsoleFdB.entreeString("Nom : ");
-        String prenom = ConsoleFdB.entreeString("Prénom : ");
-        String classe = ConsoleFdB.entreeString("Classe : ");
-        String score = ConsoleFdB.entreeString("Score : ");
-        Etudiant nouveau = new Etudiant(ine, nom, prenom, classe, score);
-        return nouveau.saveInDB(con);
-    }
+public static int creeConsole(Connection con) throws SQLException {
+    String ine = ConsoleFdB.entreeString("INE : ");
+    String nom = ConsoleFdB.entreeString("Nom : ");
+    String prenom = ConsoleFdB.entreeString("Prénom : ");
+    String classe = ConsoleFdB.entreeString("Classe : ");
+    String score = ConsoleFdB.entreeString("Score : ");
+    Etudiant nouveau = new Etudiant(ine, nom, prenom, classe, score);
+    return nouveau.saveInDB(con);
+}
 
     public static Etudiant selectInConsole(Connection con) throws SQLException {
         return ListUtils.selectOne("Choisissez un étudiant :", 

@@ -37,6 +37,7 @@ import fr.insa.toto.moveINSA.gui.MainLayout;
 import fr.insa.toto.moveINSA.model.Etudiant;
 
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
@@ -65,6 +66,13 @@ public class EtudiantCreationPanel extends VerticalLayout {
             String score = scoreField.getValue();
 
             try (Connection con = ConnectionPool.getConnection()) {
+                // Vérification des tables disponibles
+                ResultSet rs = con.getMetaData().getTables(null, null, "%", null);
+                System.out.println("Tables disponibles dans la base :");
+                while (rs.next()) {
+                    System.out.println(rs.getString("TABLE_NAME"));
+                }
+
                 // Création d'un nouvel étudiant et enregistrement en base
                 Etudiant etudiant = new Etudiant(ine, nom, prenom, classe, score);
                 etudiant.saveInDB(con);
