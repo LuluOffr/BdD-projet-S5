@@ -61,9 +61,9 @@ public class EtudiantCreationPanel extends VerticalLayout {
         Button saveButton = new Button("Sauvegarder", event -> {
             String ine = ineField.getValue();
             String nom = nomField.getValue();
-            String prenom = prenomField.getValue();
-            String classe = classeField.getValue();
-            String score = scoreField.getValue();
+            String Prénom = prenomField.getValue();
+            String Classe = classeField.getValue();
+            String Score = scoreField.getValue();
 
             try (Connection con = ConnectionPool.getConnection()) {
                 // Vérification des tables disponibles
@@ -74,7 +74,7 @@ public class EtudiantCreationPanel extends VerticalLayout {
                 }
 
                 // Création d'un nouvel étudiant et enregistrement en base
-                Etudiant etudiant = new Etudiant(ine, nom, prenom, classe, score);
+                Etudiant etudiant = new Etudiant(ine, nom, Prénom, Classe, Score);
                 etudiant.saveInDB(con);
 
                 Notification.show("Étudiant sauvegardé avec succès !");
