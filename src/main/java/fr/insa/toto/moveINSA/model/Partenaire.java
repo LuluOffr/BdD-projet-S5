@@ -113,25 +113,28 @@ public class Partenaire implements Serializable{
      * @throws EntiteDejaSauvegardee si l'id de l'entité est différent de -1
      * @throws SQLException si autre problème avec la BdD
      */
-    public int saveInDB(Connection con) throws SQLException {
-        if (this.getId() != -1) {
-            throw new EntiteDejaSauvegardee();
-        }
-        try (PreparedStatement insert = con.prepareStatement(
-                "insert into partenaire (refPartenaire) values (?)",
-                PreparedStatement.RETURN_GENERATED_KEYS)) {
-            insert.setString(1, this.getRefPartenaire());
-            insert.setString(2, this.getPays());
-            insert.setString(3, this.getNom());
-            insert.setString(4, this.getVille());
-            insert.executeUpdate();
-            try (ResultSet rid = insert.getGeneratedKeys()) {
-                rid.next();
-                this.id = rid.getInt(1);
-                return this.getId();
+    
+
+public int saveInDB(Connection con) throws SQLException {
+    if (this.getId() != -1) {
+        throw new EntiteDejaSauvegardee();
+    }
+    try (PreparedStatement insert = con.prepareStatement(
+            "INSERT INTO partenaire (refPartenaire, Pays, Nom, Ville) VALUES (?, ?, ?, ?)",
+            PreparedStatement.RETURN_GENERATED_KEYS)) {
+        insert.setString(1, this.getRefPartenaire());
+        insert.setString(2, this.getPays());
+        insert.setString(3, this.getNom());
+        insert.setString(4, this.getVille());
+        insert.executeUpdate();
+        try (ResultSet rid = insert.getGeneratedKeys()) {
+            if (rid.next()) {
+                this.id = rid.getInt(1); // Récupère l'ID généré
             }
         }
+        return this.getId();
     }
+}
 
     public static List<Partenaire> tousLesPartaires(Connection con) throws SQLException {
     try (PreparedStatement pst = con.prepareStatement("SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire")) {
