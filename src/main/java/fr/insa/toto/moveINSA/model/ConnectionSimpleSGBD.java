@@ -94,10 +94,10 @@ public class ConnectionSimpleSGBD {
  	* @throws SQLException
  	*/
 	public static Connection mysqlServeurPourM3() throws SQLException {
-    	return connectMySQL("92.222.25.165", 10073,
+    	return connectMySQL("92.222.25.165", 3306,
             	"m3_loffredo01",
             	"m3_loffredo01",
-            	"f0408491");  //  3306
+            	"f0408491");  //  
 	}
 
 	/**
