@@ -59,7 +59,7 @@ public class ConnectionPool {
     // pour une BdD en utilisant le sgbd mysql pour module M3
     static {
         config.setJdbcUrl("jdbc:mysql://92.222.25.165:3306/m3_loffredo01");
-        config.setUsername("m3_floffredo01");
+        config.setUsername("m3_loffredo01");
         config.setPassword("f0408491");
         config.setMaximumPoolSize(10);
         config.addDataSourceProperty("cachePrepStmts", "true");
