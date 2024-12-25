@@ -1,5 +1,4 @@
 //ca marche
-
 package fr.insa.toto.moveINSA.model;
 
 import java.io.Serializable;
@@ -174,4 +173,3 @@ public static int creeConsole(Connection con) throws SQLException {
                 '}';
     }
 }
-
