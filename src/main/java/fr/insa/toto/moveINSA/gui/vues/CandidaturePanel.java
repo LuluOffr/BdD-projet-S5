@@ -34,6 +34,7 @@ import fr.insa.toto.moveINSA.model.Partenaire;
 import com.vaadin.flow.component.textfield.TextField;
 
 
+
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.SQLException;
@@ -57,6 +58,8 @@ public class CandidaturePanel extends VerticalLayout {
 
     public CandidaturePanel() {
     this.add(new H3("Création d'une candidature"));
+    
+    this.add(new H3("Choississez entre 3, 4 ou 5 voeux "));
 
     // Champs pour entrer l'INE
     TextField ineField = new TextField("Entrez votre INE");

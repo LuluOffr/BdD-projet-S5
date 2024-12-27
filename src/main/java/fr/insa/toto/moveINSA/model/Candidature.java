@@ -18,7 +18,7 @@ import java.util.Optional;
  * Cette classe permet d'interfacer facilement un programme Java avec une table
  * relationnelle candidature dans une base de données.
  * 
- * @author votre_nom
+ * @author lucas
  */
 public class Candidature implements Serializable {
 
