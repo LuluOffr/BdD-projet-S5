@@ -170,7 +170,28 @@ public static Optional<Partenaire> trouvePartaire(Connection con, String refPart
     }
 }
 
+public static Optional<Partenaire> trouverParId(Connection con, int id) throws SQLException {
+    String query = "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire WHERE id = ?";
+    try (PreparedStatement pst = con.prepareStatement(query)) {
+        pst.setInt(1, id);
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                return Optional.of(new Partenaire(
+                        rs.getInt("id"),
+                        rs.getString("refPartenaire"),
+                        rs.getString("Pays"),
+                        rs.getString("Nom"),
+                        rs.getString("Ville")
+                ));
+            }
+        }
+    }
+    return Optional.empty(); // Si aucun partenaire n'est trouvé
+}
 
+public Optional<Partenaire> getPartenaire(Connection con) throws SQLException {
+    return Partenaire.trouverParId(con, this.id); // `proposePar` est l'ID du partenaire
+}
 
 public static int creeConsole(Connection con) throws SQLException {
     String refPartenaire = ConsoleFdB.entreeString("refPartenaire : ");

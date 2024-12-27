@@ -49,7 +49,7 @@ import java.util.Optional;
  */
 
 @PageTitle("Candidature Étudiant")
-@Route(value = "candidatures/nouveau", layout = MainLayout.class)
+@Route(value = "candidatures/etudiant", layout = MainLayout.class)
 public class CandidaturePanel extends VerticalLayout {
 
     private Etudiant etudiant;
@@ -156,24 +156,34 @@ public class CandidaturePanel extends VerticalLayout {
         }
     }
 
-    private void enregistrerCandidatures(Connection con) {
-        try {
-            for (int i = 0; i < choixPartenaires.size(); i++) {
-                OffreMobilite selection = choixPartenaires.get(i).getValue();
-                if (selection != null) {
-                    Candidature candidature = new Candidature(
-                            etudiant.getIne(),
-                            String.valueOf(selection.getId()),
-                            Date.valueOf(LocalDate.now()),
-                            i + 1 // Ordre
-                    );
-                    candidature.saveInDB(con);
-                }
-            }
-            Notification.show("Candidatures enregistrées avec succès !");
-        } catch (SQLException e) {
-            Notification.show("Erreur lors de l'enregistrement : " + e.getLocalizedMessage());
-            e.printStackTrace();
+private void enregistrerCandidatures(Connection con) {
+    try {
+        for (int i = 0; i < choixPartenaires.size(); i++) {
+            ComboBox<OffreMobilite> comboBox = choixPartenaires.get(i);
+            OffreMobilite selection = comboBox.getValue();
+            if (selection == null) continue;
+
+            // Récupérer le Partenaire associé
+            Partenaire partenaire = selection.getPartenaire(con);
+if (partenaire == null) {
+    throw new SQLException("Partenaire introuvable pour l'offre sélectionnée");
+}
+            // Récupérer le refPartenaire pour enregistrer dans idOffreMobilité
+            String refPartenaire = partenaire.getRefPartenaire();
+
+            // Enregistrer la candidature
+            Candidature candidature = new Candidature(
+                etudiant.getIne(), // INE de l'étudiant
+                refPartenaire,     // Nom du partenaire
+                Date.valueOf(LocalDate.now()), // Date actuelle
+                i + 1              // Ordre
+            );
+            candidature.saveInDB(con);
         }
+        Notification.show("Candidatures enregistrées avec succès !");
+    } catch (SQLException e) {
+        Notification.show("Erreur lors de l'enregistrement des candidatures : " + e.getLocalizedMessage());
+        e.printStackTrace();
     }
+}
 }

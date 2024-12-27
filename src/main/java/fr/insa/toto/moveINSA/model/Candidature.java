@@ -75,24 +75,20 @@ public int saveInDB(Connection con) throws SQLException {
     if (this.id != -1) {
         throw new EntiteDejaSauvegardee();
     }
-    System.out.println("Enregistrement dans la base de données : INE=" + this.ine + ", idOffreMobilité=" + this.idOffreMobilité);
     try (PreparedStatement insert = con.prepareStatement(
             "INSERT INTO candidature (ine, idOffreMobilité, Date, ordre) VALUES (?, ?, ?, ?)",
             PreparedStatement.RETURN_GENERATED_KEYS)) {
         insert.setString(1, this.ine);
-        insert.setString(2, this.idOffreMobilité); // Vérifiez cette valeur
+        insert.setString(2, this.idOffreMobilité); // Enregistrer le nom du partenaire
         insert.setDate(3, this.Date);
         insert.setInt(4, this.ordre);
-
-        System.out.println("Requête SQL exécutée : " + insert);
-
         insert.executeUpdate();
         try (ResultSet rid = insert.getGeneratedKeys()) {
             if (rid.next()) {
                 this.id = rid.getInt(1);
             }
+            return this.id;
         }
-        return this.id;
     }
 }
 
