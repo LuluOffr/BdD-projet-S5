@@ -76,7 +76,7 @@ public class CandidaturePanel extends VerticalLayout {
             if (etu.isPresent()) {
                 etudiant = etu.get();
                 Notification.show("Bienvenue " + etudiant.getPrenom() + " " + etudiant.getNom());
-                afficherFormulaire(con); // Appelle une méthode pour afficher le formulaire des choix
+                afficherFormulaire(); // Appelle une méthode pour afficher le formulaire des choix
             } else {
                 Notification.show("Aucun étudiant trouvé avec cet INE.");
             }
@@ -91,44 +91,54 @@ public class CandidaturePanel extends VerticalLayout {
 }
 
 
-     private void afficherFormulaire(Connection con) {
-        try {
-            // Charger les offres disponibles
-            List<OffreMobilite> offres = OffreMobilite.toutesLesOffres(con);
+     private void afficherFormulaire() {
+    try (Connection con = ConnectionPool.getConnection()) {
+        // Charger les offres disponibles
+        List<OffreMobilite> offres = OffreMobilite.toutesLesOffres(con);
 
-            if (offres.isEmpty()) {
-                Notification.show("Aucune offre de mobilité disponible !");
-                return;
-            }
-
-            choixPartenaires = new ArrayList<>();
-            for (int i = 1; i <= 5; i++) {
-                ComboBox<OffreMobilite> comboBox = new ComboBox<>("Établissement choisi n°" + i);
-                comboBox.setItems(offres);
-                comboBox.setItemLabelGenerator(offre -> {
-    try {
-        // Récupère les informations du partenaire associé à l'offre
-        return offre.getPartenaire(con).getRefPartenaire() + " (" + offre.getNbrPlaces() + " places restantes)";
-    } catch (SQLException ex) {
-        ex.printStackTrace();
-        Notification.show("Erreur lors de la récupération du partenaire : " + ex.getLocalizedMessage());
-        return "Erreur lors de la récupération";
-    }
-});
-                comboBox.addValueChangeListener(event -> checkDuplicates());
-                choixPartenaires.add(comboBox);
-                this.add(comboBox);
-            }
-
-            // Bouton pour valider les choix
-            validerButton = new Button("Valider mes choix", event -> enregistrerCandidatures(con));
-            this.add(validerButton);
-
-        } catch (SQLException e) {
-            Notification.show("Erreur lors du chargement des offres : " + e.getLocalizedMessage());
-            e.printStackTrace();
+        if (offres.isEmpty()) {
+            Notification.show("Aucune offre de mobilité disponible !");
+            return;
         }
+
+        choixPartenaires = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            ComboBox<OffreMobilite> comboBox = new ComboBox<>("Établissement choisi n°" + i);
+            comboBox.setItems(offres);
+
+            // Générer les libellés des offres
+            comboBox.setItemLabelGenerator(offre -> {
+                try (Connection localCon = ConnectionPool.getConnection()) {
+                    Partenaire partenaire = offre.getPartenaire(localCon); // Récupérer le partenaire associé
+                    return partenaire.getRefPartenaire() + " (" + offre.getNbrPlaces() + " places restantes)";
+                } catch (SQLException ex) {
+                    Notification.show("Erreur lors de la récupération du partenaire : " + ex.getLocalizedMessage());
+                    return "Erreur : données non disponibles";
+                }
+            });
+
+            // Vérifier les doublons lors des sélections
+            comboBox.addValueChangeListener(event -> checkDuplicates());
+            choixPartenaires.add(comboBox);
+            this.add(comboBox);
+        }
+
+        // Bouton pour valider les choix
+        validerButton = new Button("Valider mes choix", event -> {
+            try (Connection localCon = ConnectionPool.getConnection()) {
+                enregistrerCandidatures(localCon);
+            } catch (SQLException ex) {
+                Notification.show("Erreur lors de l'enregistrement des candidatures : " + ex.getLocalizedMessage());
+                ex.printStackTrace();
+            }
+        });
+        this.add(validerButton);
+
+    } catch (SQLException e) {
+        Notification.show("Erreur lors du chargement des offres : " + e.getLocalizedMessage());
+        e.printStackTrace();
     }
+}
 
     private void checkDuplicates() {
         List<OffreMobilite> selections = new ArrayList<>();
