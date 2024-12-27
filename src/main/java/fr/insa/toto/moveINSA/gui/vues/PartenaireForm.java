@@ -32,7 +32,11 @@ public class PartenaireForm extends FormLayout {
 
     private Partenaire model;
 
-    private TextField tfrefPartenaire = new TextField("refPartenaire");
+    private TextField tfRefPartenaire = new TextField("Nom Partenaire");
+    private TextField tfPays = new TextField("Pays");
+    private TextField tfNom = new TextField("Nom de l'établissement");
+    private TextField tfVille = new TextField("Ville");
+
     private PasswordField initialPasswordField = new PasswordField("Mot de passe initial");
     private Label generatedPasswordLabel = new Label();
 
@@ -42,8 +46,8 @@ public class PartenaireForm extends FormLayout {
         this.model = model;
         this.setEnabled(modifiable);
 
-        // Désactiver le champ refPartenaire tant que le mot de passe initial n'est pas validé
-        this.tfrefPartenaire.setEnabled(false);
+        // Désactiver les champs jusqu'à validation du mot de passe initial
+        disableAllFields();
 
         // Ajout du champ de mot de passe initial et bouton de validation
         this.add(this.initialPasswordField, this.validateButton);
@@ -53,34 +57,55 @@ public class PartenaireForm extends FormLayout {
             String enteredPassword = this.initialPasswordField.getValue();
             if ("partenaire2024".equals(enteredPassword)) {
                 Notification.show("Mot de passe validé !");
-                this.tfrefPartenaire.setEnabled(true); // Activer le champ refPartenaire
+                enableAllFields();
             } else {
                 Notification.show("Mot de passe incorrect !", 3000, Notification.Position.MIDDLE);
             }
         });
 
-        // Ajout du champ refPartenaire et de l'étiquette pour afficher le mot de passe généré
-        this.tfrefPartenaire.addValueChangeListener(event -> {
-            String enteredRef = this.tfrefPartenaire.getValue();
-            if (!enteredRef.isEmpty()) {
-                String generatedPassword = enteredRef + "2024";
-                this.generatedPasswordLabel.setText("Mot de passe généré : " + generatedPassword);
-            } else {
-                this.generatedPasswordLabel.setText("");
-            }
-        });
+        // Ajout des champs
+        this.tfRefPartenaire.addValueChangeListener(event -> updateGeneratedPassword());
+        this.add(this.tfRefPartenaire, this.tfPays, this.tfNom, this.tfVille, this.generatedPasswordLabel);
 
-        this.add(this.tfrefPartenaire, this.generatedPasswordLabel);
-
-        // Mettre à jour la vue et ajouter les champs
+        // Mettre à jour la vue
         this.updateView();
     }
 
+    private void disableAllFields() {
+        this.tfRefPartenaire.setEnabled(false);
+        this.tfPays.setEnabled(false);
+        this.tfNom.setEnabled(false);
+        this.tfVille.setEnabled(false);
+    }
+
+    private void enableAllFields() {
+        this.tfRefPartenaire.setEnabled(true);
+        this.tfPays.setEnabled(true);
+        this.tfNom.setEnabled(true);
+        this.tfVille.setEnabled(true);
+    }
+
+    private void updateGeneratedPassword() {
+        String enteredRef = this.tfRefPartenaire.getValue();
+        if (!enteredRef.isEmpty()) {
+            String generatedPassword = enteredRef + "2024";
+            this.generatedPasswordLabel.setText("Mot de passe généré : " + generatedPassword);
+        } else {
+            this.generatedPasswordLabel.setText("");
+        }
+    }
+
     public void updateModel() {
-        this.model.setRefPartenaire(this.tfrefPartenaire.getValue());
+        this.model.setRefPartenaire(this.tfRefPartenaire.getValue());
+        this.model.setPays(this.tfPays.getValue());
+        this.model.setNom(this.tfNom.getValue());
+        this.model.setVille(this.tfVille.getValue());
     }
 
     public void updateView() {
-        this.tfrefPartenaire.setValue(this.model.getRefPartenaire());
+        this.tfRefPartenaire.setValue(this.model.getRefPartenaire());
+        this.tfPays.setValue(this.model.getPays());
+        this.tfNom.setValue(this.model.getNom());
+        this.tfVille.setValue(this.model.getVille());
     }
 }
