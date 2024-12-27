@@ -147,6 +147,10 @@ public int saveInDB(Connection con) throws SQLException {
         return res;
     }
 }
+
+    
+    
+    
 public static Optional<Partenaire> trouvePartaire(Connection con, String refPart) throws SQLException {
     try (PreparedStatement pst = con.prepareStatement(
             "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire")) {
@@ -165,6 +169,9 @@ public static Optional<Partenaire> trouvePartaire(Connection con, String refPart
         }
     }
 }
+
+
+
 
 public static int creeConsole(Connection con) throws SQLException {
     String refPartenaire = ConsoleFdB.entreeString("refPartenaire : ");
@@ -224,23 +231,6 @@ public void setVille(String Ville) {
         return id;
     }
 
-public static Optional<Partenaire> rechercher(Connection con, String refPartenaire) throws SQLException {
-    String query = "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire WHERE refPartenaire = ?";
-    try (PreparedStatement pst = con.prepareStatement(query)) {
-        pst.setString(1, refPartenaire);
-        try (ResultSet rs = pst.executeQuery()) {
-            if (rs.next()) {
-                return Optional.of(new Partenaire(
-                        rs.getInt("id"),
-                        rs.getString("refPartenaire"),
-                        rs.getString("Pays"),
-                        rs.getString("Nom"),
-                        rs.getString("Ville")
-                ));
-            }
-        }
-    }
-    return Optional.empty(); // Si aucun partenaire trouvé
-}
+
 
 }

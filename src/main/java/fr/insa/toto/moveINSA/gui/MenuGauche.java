@@ -33,6 +33,7 @@ import fr.insa.toto.moveINSA.gui.vues.RAZBdDPanel;
 import fr.insa.toto.moveINSA.gui.vues.TestDriverPanel;
 import fr.insa.toto.moveINSA.gui.vues.EtudiantCreationPanel;
 import fr.insa.toto.moveINSA.gui.vues.EtudiantsListePanel;
+import fr.insa.toto.moveINSA.gui.vues.CandidaturePanel;
 
 /**
  *
@@ -56,11 +57,12 @@ public class MenuGauche extends SideNav {
 
         // Menu étudiants
         SideNavItem etudiants = new SideNavItem("étudiants");
-        etudiants.addItem(new SideNavItem("liste (SRI)", EtudiantsListePanel.class)); // Liste des étudiants
-        etudiants.addItem(new SideNavItem("nouveau (SRI)", EtudiantCreationPanel.class)); // Création d'un étudiant
+        etudiants.addItem(new SideNavItem("liste (SRI)", EtudiantsListePanel.class)); 
+        etudiants.addItem(new SideNavItem("nouveau (SRI)", EtudiantCreationPanel.class)); 
+        etudiants.addItem(new SideNavItem("Candidature (ETUDIANT)", CandidaturePanel.class));
         
         //Menu candidature
-        SideNavItem Candidature = new SideNavItem("Candidature (ETUDIANT)");
+        //SideNavItem Candidature = new SideNavItem("Candidature (ETUDIANT)");
 
         // Menu debug
         SideNavItem debug = new SideNavItem("debug");

@@ -81,7 +81,7 @@ public static List<Etudiant> tousLesEtudiants(Connection con) throws SQLExceptio
         return etudiants;
     }
 }
-
+//trouve l'etudiant avec l'ine
 public static Optional<Etudiant> trouveEtudiant(Connection con, String ine) throws SQLException {
     String query = "SELECT ine, nom, Prénom AS prenom, Classe AS classe, Score AS score FROM etudiant WHERE ine = ?";
     try (PreparedStatement pst = con.prepareStatement(query)) {
@@ -101,6 +101,7 @@ public static Optional<Etudiant> trouveEtudiant(Connection con, String ine) thro
     }
     return Optional.empty();
 }
+
 
 public static int creeConsole(Connection con) throws SQLException {
     String ine = ConsoleFdB.entreeString("INE : ");
