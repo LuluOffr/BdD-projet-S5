@@ -34,6 +34,8 @@ import fr.insa.toto.moveINSA.gui.vues.TestDriverPanel;
 import fr.insa.toto.moveINSA.gui.vues.EtudiantCreationPanel;
 import fr.insa.toto.moveINSA.gui.vues.EtudiantsListePanel;
 import fr.insa.toto.moveINSA.gui.vues.CandidaturePanel;
+import fr.insa.toto.moveINSA.gui.vues.AttributionSRI;
+import fr.insa.toto.moveINSA.gui.vues.AttributionEtudiant;
 
 /**
  *
@@ -61,6 +63,13 @@ public class MenuGauche extends SideNav {
         etudiants.addItem(new SideNavItem("nouveau (SRI)", EtudiantCreationPanel.class)); 
         etudiants.addItem(new SideNavItem("Candidature (ETUDIANT)", CandidaturePanel.class));
         
+        
+        // Menu attribution
+        SideNavItem attribution = new SideNavItem("attribution");
+        //attribution.addItem(new SideNavItem("attribution (SRI)", AttributionSRI.class)); 
+        //attribution.addItem(new SideNavItem("attribution (ETUDIANT)", AttributionEtudiant.class)); 
+
+        
         //Menu candidature
         //SideNavItem Candidature = new SideNavItem("Candidature (ETUDIANT)");
 
@@ -78,6 +87,6 @@ public class MenuGauche extends SideNav {
         jeux.addItem(new SideNavItem("trouve", TrouveEntier.class));
 
         // Ajout de tous les menus
-        this.addItem(main, partenaires, offres, etudiants, jeux, debug);
+        this.addItem(main, partenaires, offres, etudiants, attribution,jeux, debug);
     }
 }
