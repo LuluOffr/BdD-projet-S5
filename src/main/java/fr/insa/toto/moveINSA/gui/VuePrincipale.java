@@ -30,19 +30,15 @@ import java.util.List;
 public class VuePrincipale extends VerticalLayout {
 
     public VuePrincipale() {
-        this.add(new H3("Petit programme pour démarrer le projet M3 2024"));
+        this.add(new H3("Bienvenue sur moveINSA"));
         List<Paragraph> attention = List.of(
-                new Paragraph("Attention : la base de donnée utilisée par défaut "
-                        + "est créée en mémoire."),
-                new Paragraph("Vous devez la réinitialiser après chaque démarrage."
-                        + "Pour cela, allez dans le menu debug;RAZ BdD et cliquez sur le bouton"),
-                new Paragraph("Dans cette version, les connexions à la base de donnée sont gérées par un pool de connexion"),
-                new Paragraph("Pour utiliser une autre base de donnée, vous devez modifier la classe "
-                        + "fr.insa.beuvron.vaadin.utils.ConnectionPool"),
-                new Paragraph("Si vous utilisez le serveur MySQL fourni pour M3, "
-                        + "il vous suffit de commenter la def pour H2 et de dé-commenter "
-                        + "la def pour le serveur mysql de M3. Pensez évidemment à modifier pour donner VOS login/pass")
+                new Paragraph("Attention : ceci est la beta du site "),
+                new Paragraph("Vous pouvez vous connecter en tant que qu'établissement Partenaire, membre du SRI, "
+                        + "ou alors en tant qu'étudiant"),
+                new Paragraph("Version créé par Salim, Djibril et Lucas")
+
         );
+        
         attention.get(0).getStyle().set("color", "red");
         attention.forEach((p) -> this.add(p));
 
