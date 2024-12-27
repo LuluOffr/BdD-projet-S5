@@ -1,5 +1,5 @@
 //ca marche
-package fr.insa.toto.moveINSA.model;
+package fr.insa.toto.moveINSA.moveINSA.model;
 
 import java.io.Serializable;
 import java.sql.Connection;
@@ -17,7 +17,6 @@ public class Etudiant implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // Attributs
-    private int id;
     private String ine;
     private String nom;
     private String prenom;
@@ -25,12 +24,10 @@ public class Etudiant implements Serializable {
     private String score;
 
     // Constructeurs
-    public Etudiant(String ine, String nom, String prenom, String classe, String score) {
-        this(-1, ine, nom, prenom, classe, score);
-    }
+    
 
-    public Etudiant(int id, String ine, String nom, String prenom, String classe, String score) {
-        this.id = id;
+    public Etudiant(String ine, String nom, String prenom, String classe, String score) {
+    
         this.ine = ine;
         this.nom = nom;
         this.prenom = prenom;
@@ -40,27 +37,44 @@ public class Etudiant implements Serializable {
 
     // Méthodes CRUD
 
-    public int saveInDB(Connection con) throws SQLException {
-        if (this.id != -1) {
-            throw new IllegalStateException("Étudiant déjà sauvegardé.");
-        }
-        String query = "INSERT INTO etudiant (ine, nom, Prénom, Classe, Score) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement insert = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            insert.setString(1, this.ine);
-            insert.setString(2, this.nom);
-            insert.setString(3, this.prenom);
-            insert.setString(4, this.classe);
-            insert.setString(5, this.score);
-            insert.executeUpdate();
+   public int saveInDB(Connection con) throws SQLException {
+    if (this.ine == null || this.ine.isEmpty()) {
+        throw new IllegalStateException("L'INE de l'étudiant est invalide ou non défini.");
+    }
 
-            try (ResultSet rs = insert.getGeneratedKeys()) {
-                if (rs.next()) {
-                    this.id = rs.getInt(1);
-                }
+    String queryCheck = "SELECT COUNT(*) FROM etudiants WHERE ine = ?";
+    try (PreparedStatement checkStmt = con.prepareStatement(queryCheck)) {
+        checkStmt.setString(1, this.ine);
+        try (ResultSet rs = checkStmt.executeQuery()) {
+            if (rs.next() && rs.getInt(1) > 0) {
+                throw new IllegalStateException("Un étudiant avec cet INE est déjà sauvegardé dans la base de données.");
             }
-            return this.id;
         }
     }
+
+    String insertQuery = "INSERT INTO etudiants (ine, nom, prenom, classe, score) VALUES (?, ?, ?, ?, ?)";
+    try (PreparedStatement insertStmt = con.prepareStatement(insertQuery, PreparedStatement.RETURN_GENERATED_KEYS)) {
+        insertStmt.setString(1, this.ine);
+        insertStmt.setString(2, this.nom);
+        insertStmt.setString(3, this.prenom);
+        insertStmt.setString(4, this.classe);
+        insertStmt.setString(5, this.score);
+
+        int affectedRows = insertStmt.executeUpdate();
+        if (affectedRows == 0) {
+            throw new SQLException("Échec de la sauvegarde de l'étudiant, aucune ligne ajoutée.");
+        }
+
+        try (ResultSet generatedKeys = insertStmt.getGeneratedKeys()) {
+            if (generatedKeys.next()) {
+                return generatedKeys.getInt(1); // Retourne l'ID généré si nécessaire.
+            } else {
+                throw new SQLException("Échec de la sauvegarde de l'étudiant, aucun ID généré.");
+            }
+        }
+    }
+}
+
 
 public static List<Etudiant> tousLesEtudiants(Connection con) throws SQLException {
     String query = "SELECT ine, nom, Prénom AS prenom, Classe AS classe, Score AS score FROM etudiant";
@@ -69,7 +83,6 @@ public static List<Etudiant> tousLesEtudiants(Connection con) throws SQLExceptio
         List<Etudiant> etudiants = new ArrayList<>();
         while (rs.next()) {
             etudiants.add(new Etudiant(
-                    -1, 
                     rs.getString("ine"),
                     rs.getString("nom"),
                     rs.getString("prenom"),
@@ -88,7 +101,6 @@ public static Optional<Etudiant> trouveEtudiant(Connection con, String ine) thro
         try (ResultSet rs = pst.executeQuery()) {
             if (rs.next()) {
                 return Optional.of(new Etudiant(
-                        -1, //pas d'id
                         rs.getString("ine"),
                         rs.getString("nom"),
                         rs.getString("prenom"),
@@ -117,9 +129,7 @@ public static int creeConsole(Connection con) throws SQLException {
     }
 
     // Méthodes Getters et Setters
-    public int getId() {
-        return id;
-    }
+    
 
     public String getIne() {
         return ine;
@@ -163,9 +173,7 @@ public static int creeConsole(Connection con) throws SQLException {
 
     @Override
     public String toString() {
-        return "Etudiant{" +
-                "id=" + id +
-                ", ine='" + ine + '\'' +
+        return "Etudiant{ ine='" + ine + '\'' +
                 ", nom='" + nom + '\'' +
                 ", prenom='" + prenom + '\'' +
                 ", classe='" + classe + '\'' +
@@ -173,3 +181,4 @@ public static int creeConsole(Connection con) throws SQLException {
                 '}';
     }
 }
+
