@@ -47,17 +47,17 @@ public class MenuGauche extends SideNav {
         // Menu partenaires
         SideNavItem partenaires = new SideNavItem("partenaires");
         partenaires.addItem(new SideNavItem("liste", PartenairesPanel.class));
-        partenaires.addItem(new SideNavItem("nouveau", NouveauPartenairePanel.class));
+        partenaires.addItem(new SideNavItem("nouveau (PARTENAIRE)", NouveauPartenairePanel.class));
 
         // Menu offres
         SideNavItem offres = new SideNavItem("offres");
         offres.addItem(new SideNavItem("liste", OffresPanel.class));
-        offres.addItem(new SideNavItem("nouvelle", NouvelleOffrePanel.class));
+        offres.addItem(new SideNavItem("nouvelle (PARTENAIRE)", NouvelleOffrePanel.class));
 
         // Menu étudiants
         SideNavItem etudiants = new SideNavItem("étudiants");
-        etudiants.addItem(new SideNavItem("liste", EtudiantsListePanel.class)); // Liste des étudiants
-        etudiants.addItem(new SideNavItem("nouveau", EtudiantCreationPanel.class)); // Création d'un étudiant
+        etudiants.addItem(new SideNavItem("liste (SRI)", EtudiantsListePanel.class)); // Liste des étudiants
+        etudiants.addItem(new SideNavItem("nouveau (SRI)", EtudiantCreationPanel.class)); // Création d'un étudiant
 
         // Menu debug
         SideNavItem debug = new SideNavItem("debug");

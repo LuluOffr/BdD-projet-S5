@@ -35,7 +35,7 @@ public class VuePrincipale extends VerticalLayout {
                 new Paragraph("Attention : ceci est la beta du site "),
                 new Paragraph("Vous pouvez vous connecter en tant que qu'établissement Partenaire, membre du SRI, "
                         + "ou alors en tant qu'étudiant"),
-                new Paragraph("Version créé par Salim, Djibril et Lucas")
+                new Paragraph("Version créée par Salim, Djibril et Lucas")
 
         );
         
