@@ -54,7 +54,7 @@ public class EtudiantsListePanel extends VerticalLayout {
             Grid<Etudiant> grid = new Grid<>(Etudiant.class, false);
 
             // Ajouter des colonnes spécifiques
-            grid.addColumn(Etudiant::getId).setHeader("ID");
+            //grid.addColumn(Etudiant::getId).setHeader("ID");
             grid.addColumn(Etudiant::getIne).setHeader("INE");
             grid.addColumn(Etudiant::getNom).setHeader("Nom");
             grid.addColumn(Etudiant::getPrenom).setHeader("Prénom");
