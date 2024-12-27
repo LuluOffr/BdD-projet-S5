@@ -172,9 +172,6 @@ public static Optional<Partenaire> trouvePartaire(Connection con, String refPart
 
 
 
-
-
-
 public static int creeConsole(Connection con) throws SQLException {
     String refPartenaire = ConsoleFdB.entreeString("refPartenaire : ");
     String Pays = ConsoleFdB.entreeString("Pays : ");

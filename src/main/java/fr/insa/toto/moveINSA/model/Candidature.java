@@ -71,26 +71,30 @@ public class Candidature implements Serializable {
                 '}';
     }
 
-    public int saveInDB(Connection con) throws SQLException {
-        if (this.id != -1) {
-            throw new EntiteDejaSauvegardee();
-        }
-        try (PreparedStatement insert = con.prepareStatement(
-                "INSERT INTO candidature (ine, idOffreMobilité, Date, ordre) VALUES (?, ?, ?, ?)",
-                PreparedStatement.RETURN_GENERATED_KEYS)) {
-            insert.setString(1, this.ine);
-            insert.setString(2, this.idOffreMobilité);
-            insert.setDate(3, this.Date);
-            insert.setInt(4, this.ordre);
-            insert.executeUpdate();
-            try (ResultSet rid = insert.getGeneratedKeys()) {
-                if (rid.next()) {
-                    this.id = rid.getInt(1);
-                }
-                return this.id;
+public int saveInDB(Connection con) throws SQLException {
+    if (this.id != -1) {
+        throw new EntiteDejaSauvegardee();
+    }
+    System.out.println("Enregistrement dans la base de données : INE=" + this.ine + ", idOffreMobilité=" + this.idOffreMobilité);
+    try (PreparedStatement insert = con.prepareStatement(
+            "INSERT INTO candidature (ine, idOffreMobilité, Date, ordre) VALUES (?, ?, ?, ?)",
+            PreparedStatement.RETURN_GENERATED_KEYS)) {
+        insert.setString(1, this.ine);
+        insert.setString(2, this.idOffreMobilité); // Vérifiez cette valeur
+        insert.setDate(3, this.Date);
+        insert.setInt(4, this.ordre);
+
+        System.out.println("Requête SQL exécutée : " + insert);
+
+        insert.executeUpdate();
+        try (ResultSet rid = insert.getGeneratedKeys()) {
+            if (rid.next()) {
+                this.id = rid.getInt(1);
             }
         }
+        return this.id;
     }
+}
 
 public static List<Candidature> toutesLesCandidatures(Connection con) throws SQLException {
     try (PreparedStatement pst = con.prepareStatement(
@@ -126,6 +130,24 @@ public static Optional<Candidature> trouveCandidature(Connection con, String ine
         } else {
             return Optional.empty();
         }
+    }
+}
+
+public static List<Candidature> trouverCandidaturesParEtudiant(Connection con, String ine) throws SQLException {
+    String query = "SELECT ine, idOffreMobilité, Date, ordre FROM candidature WHERE ine = ?";
+    try (PreparedStatement pst = con.prepareStatement(query)) {
+        pst.setString(1, ine);
+        ResultSet rs = pst.executeQuery();
+        List<Candidature> candidatures = new ArrayList<>();
+        while (rs.next()) {
+            candidatures.add(new Candidature(
+                rs.getString("ine"),
+                rs.getString("idOffreMobilité"),
+                rs.getDate("Date"),
+                rs.getInt("ordre")
+            ));
+        }
+        return candidatures;
     }
 }
 

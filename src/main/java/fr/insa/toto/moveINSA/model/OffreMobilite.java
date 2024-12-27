@@ -107,10 +107,10 @@ public class OffreMobilite {
     }
     
     
-public Partenaire getPartenaire(Connection con) throws SQLException {
+    public Partenaire getPartenaire(Connection con) throws SQLException {
     String query = "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire WHERE id = ?";
     try (PreparedStatement pst = con.prepareStatement(query)) {
-        pst.setInt(1, this.proposePar); // Utilisation de proposePar pour trouver le partenaire
+        pst.setInt(1, this.proposePar); // Utilise l'ID du partenaire
         try (ResultSet rs = pst.executeQuery()) {
             if (rs.next()) {
                 return new Partenaire(
@@ -120,12 +120,13 @@ public Partenaire getPartenaire(Connection con) throws SQLException {
                         rs.getString("Nom"),
                         rs.getString("Ville")
                 );
-            } else {
-                throw new SQLException("Aucun partenaire trouvé pour l'ID : " + this.proposePar);
             }
         }
     }
+    throw new SQLException("Partenaire introuvable pour l'offre de mobilité avec ID : " + this.proposePar);
 }
+    
+
 
     public static int creeConsole(Connection con) throws SQLException {
         Partenaire p = Partenaire.selectInConsole(con);

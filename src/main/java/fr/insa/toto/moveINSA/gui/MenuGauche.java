@@ -66,7 +66,7 @@ public class MenuGauche extends SideNav {
         
         // Menu attribution
         SideNavItem attribution = new SideNavItem("attribution");
-        //attribution.addItem(new SideNavItem("attribution (SRI)", AttributionSRI.class)); 
+        attribution.addItem(new SideNavItem("attribution (SRI)", AttributionSRI.class)); 
         //attribution.addItem(new SideNavItem("attribution (ETUDIANT)", AttributionEtudiant.class)); 
 
         

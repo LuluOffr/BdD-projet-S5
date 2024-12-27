@@ -59,7 +59,7 @@ public class CandidaturePanel extends VerticalLayout {
     public CandidaturePanel() {
     this.add(new H3("Création d'une candidature"));
     
-    this.add(new H3("Choississez entre 3, 4 ou 5 voeux "));
+    this.add(new H3("Choississez entre 3,4 ou 5 voeux "));
 
     // Champs pour entrer l'INE
     TextField ineField = new TextField("Entrez votre INE");
