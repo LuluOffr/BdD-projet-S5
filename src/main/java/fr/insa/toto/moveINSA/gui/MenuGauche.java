@@ -58,6 +58,9 @@ public class MenuGauche extends SideNav {
         SideNavItem etudiants = new SideNavItem("étudiants");
         etudiants.addItem(new SideNavItem("liste (SRI)", EtudiantsListePanel.class)); // Liste des étudiants
         etudiants.addItem(new SideNavItem("nouveau (SRI)", EtudiantCreationPanel.class)); // Création d'un étudiant
+        
+        //Menu candidature
+        SideNavItem Candidature = new SideNavItem("Candidature (ETUDIANT)");
 
         // Menu debug
         SideNavItem debug = new SideNavItem("debug");
