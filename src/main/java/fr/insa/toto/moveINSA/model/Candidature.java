@@ -1,8 +1,6 @@
 //marche
 package fr.insa.toto.moveINSA.model;
 
-import fr.insa.beuvron.utils.ConsoleFdB;
-import fr.insa.beuvron.utils.list.ListUtils;
 import java.io.Serializable;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,6 +9,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Scanner;
 
 /**
  * Classe "miroir" de la table candidature.
@@ -27,138 +26,126 @@ public class Candidature implements Serializable {
     private int id;
     private String ine;
     private String idOffreMobilité;
-    private java.sql.Date Date;
+    private java.sql.Date date;
     private int ordre;
 
-    /**
-     * Création d'une nouvelle Candidature en mémoire, non existante dans la Base
-     * de données.
-     *
-     * @param ine
-     * @param idOffreMobilité
-     * @param Date
-     * @param ordre
-     */
-    public Candidature(String ine, String idOffreMobilité, java.sql.Date Date, int ordre) {
-        this(-1, ine, idOffreMobilité, Date, ordre);
+    public Candidature(String ine, String idOffreMobilité, java.sql.Date date, int ordre) {
+        this(-1, ine, idOffreMobilité, date, ordre);
     }
 
-    /**
-     * Création d'une Candidature retrouvée dans la base de données.
-     *
-     * @param id
-     * @param ine
-     * @param idOffreMobilité
-     * @param Date
-     * @param ordre
-     */
-    public Candidature(int id, String ine, String idOffreMobilite, java.sql.Date date, int ordre) {
+    public Candidature(int id, String ine, String idOffreMobilité, java.sql.Date date, int ordre) {
         this.id = id;
         this.ine = ine;
         this.idOffreMobilité = idOffreMobilité;
-        this.Date = Date;
+        this.date = date;
         this.ordre = ordre;
     }
 
     @Override
     public String toString() {
         return "Candidature{" +
-                "id=" + id +
-                ", ine='" + ine + '\'' +
-                ", idOffreMobilité='" + idOffreMobilité + '\'' +
-                ", Date=" + Date +
-                ", ordre=" + ordre +
-                '}';
+               "id=" + id +
+               ", ine='" + ine + '\'' +
+               ", idOffreMobilité='" + idOffreMobilité + '\'' +
+               ", date=" + date +
+               ", ordre=" + ordre +
+               '}';
     }
 
-public int saveInDB(Connection con) throws SQLException {
-    if (this.id != -1) {
-        throw new EntiteDejaSauvegardee();
-    }
-    try (PreparedStatement insert = con.prepareStatement(
-            "INSERT INTO candidature (ine, idOffreMobilité, Date, ordre) VALUES (?, ?, ?, ?)",
-            PreparedStatement.RETURN_GENERATED_KEYS)) {
-        insert.setString(1, this.ine);
-        insert.setString(2, this.idOffreMobilité); // Enregistrer le nom du partenaire
-        insert.setDate(3, this.Date);
-        insert.setInt(4, this.ordre);
-        insert.executeUpdate();
-        try (ResultSet rid = insert.getGeneratedKeys()) {
-            if (rid.next()) {
-                this.id = rid.getInt(1);
+    public int saveInDB(Connection con) throws SQLException {
+        if (this.id != -1) {
+            throw new SQLException("Candidature déjà enregistrée.");
+        }
+
+        if (!verifierOffreMobiliteExiste(con, this.idOffreMobilité)) {
+            throw new SQLException("L'offre de mobilité spécifiée n'existe pas.");
+        }
+
+        try (PreparedStatement insert = con.prepareStatement(
+                "INSERT INTO candidature (ine, idOffreMobilité, Date, ordre) VALUES (?, ?, ?, ?)",
+                PreparedStatement.RETURN_GENERATED_KEYS)) {
+            insert.setString(1, this.ine);
+            insert.setString(2, this.idOffreMobilité);
+            insert.setDate(3, this.date);
+            insert.setInt(4, this.ordre);
+            insert.executeUpdate();
+            try (ResultSet rid = insert.getGeneratedKeys()) {
+                if (rid.next()) {
+                    this.id = rid.getInt(1);
+                }
+                return this.id;
             }
-            return this.id;
         }
     }
-}
 
-public static List<Candidature> toutesLesCandidatures(Connection con) throws SQLException {
-    try (PreparedStatement pst = con.prepareStatement(
-            "SELECT ine, idOffreMobilité, Date, ordre FROM candidature")) {
-        ResultSet rs = pst.executeQuery();
-        List<Candidature> res = new ArrayList<>();
-        while (rs.next()) {
-            res.add(new Candidature(
-                    -1, // Pas d'id
-                    rs.getString(1),
-                    rs.getString(2),
-                    rs.getDate(3),
-                    rs.getInt(4)
-            ));
-        }
-        return res;
-    }
-}
-
-public static Optional<Candidature> trouveCandidature(Connection con, String ine) throws SQLException {
-    try (PreparedStatement pst = con.prepareStatement(
-            "SELECT ine, idOffreMobilité, Date, ordre FROM candidature WHERE ine = ?")) {
-        pst.setString(1, ine);
-        ResultSet rs = pst.executeQuery();
-        if (rs.next()) {
-            return Optional.of(new Candidature(
-                    -1, // Pas d'id
-                    rs.getString(1),
-                    rs.getString(2),
-                    rs.getDate(3),
-                    rs.getInt(4)
-            ));
-        } else {
-            return Optional.empty();
+    private boolean verifierOffreMobiliteExiste(Connection con, String idOffreMobilite) throws SQLException {
+        String query = "SELECT COUNT(*) FROM offre_de_mobilité WHERE id = ?";
+        try (PreparedStatement pst = con.prepareStatement(query)) {
+            pst.setString(1, idOffreMobilite);
+            try (ResultSet rs = pst.executeQuery()) {
+                return rs.next() && rs.getInt(1) > 0;
+            }
         }
     }
-}
 
-public static List<Candidature> trouverCandidaturesParEtudiant(Connection con, String ine) throws SQLException {
-    String query = "SELECT ine, idOffreMobilité, Date, ordre FROM candidature WHERE ine = ?";
-    try (PreparedStatement pst = con.prepareStatement(query)) {
-        pst.setString(1, ine);
-        ResultSet rs = pst.executeQuery();
-        List<Candidature> candidatures = new ArrayList<>();
-        while (rs.next()) {
-            candidatures.add(new Candidature(
-                rs.getString("ine"),
-                rs.getString("idOffreMobilité"),
-                rs.getDate("Date"),
-                rs.getInt("ordre")
-            ));
+    public static List<Candidature> toutesLesCandidatures(Connection con) throws SQLException {
+        try (PreparedStatement pst = con.prepareStatement(
+                "SELECT id, ine, idOffreMobilité, Date, ordre FROM candidature")) {
+            ResultSet rs = pst.executeQuery();
+            List<Candidature> res = new ArrayList<>();
+            while (rs.next()) {
+                res.add(new Candidature(
+                        rs.getInt("id"),
+                        rs.getString("ine"),
+                        rs.getString("idOffreMobilité"),
+                        rs.getDate("Date"),
+                        rs.getInt("ordre")
+                ));
+            }
+            return res;
         }
-        return candidatures;
     }
-}
 
+    public static Optional<Candidature> trouveCandidature(Connection con, String ine) throws SQLException {
+        try (PreparedStatement pst = con.prepareStatement(
+                "SELECT id, ine, idOffreMobilité, Date, ordre FROM candidature WHERE ine = ?")) {
+            pst.setString(1, ine);
+            ResultSet rs = pst.executeQuery();
+            if (rs.next()) {
+                return Optional.of(new Candidature(
+                        rs.getInt("id"),
+                        rs.getString("ine"),
+                        rs.getString("idOffreMobilité"),
+                        rs.getDate("Date"),
+                        rs.getInt("ordre")
+                ));
+            } else {
+                return Optional.empty();
+            }
+        }
+    }
+
+    /**
+     * Crée une nouvelle candidature en saisissant les données via la console.
+     */
     public static int creeConsole(Connection con) throws SQLException {
-        String ine = ConsoleFdB.entreeString("INE : ");
-        String idOffreMobilite = ConsoleFdB.entreeString("ID Offre Mobilité : ");
-        java.sql.Date date = java.sql.Date.valueOf(ConsoleFdB.entreeString("Date (YYYY-MM-DD) : "));
-        int ordre = ConsoleFdB.entreeInt("Ordre : ");
-        Candidature nouvelle = new Candidature(ine, idOffreMobilite, date, ordre);
-        return nouvelle.saveInDB(con);
-    }
+        Scanner scanner = new Scanner(System.in);
 
-    public static Candidature selectInConsole(Connection con) throws SQLException {
-        return ListUtils.selectOne("Choisissez une candidature :",
-                toutesLesCandidatures(con), (elem) -> elem.getIne());
+        System.out.print("INE : ");
+        String ine = scanner.nextLine();
+
+        System.out.print("ID Offre Mobilité : ");
+        String idOffreMobilite = scanner.nextLine();
+
+        System.out.print("Date (YYYY-MM-DD) : ");
+        java.sql.Date date = java.sql.Date.valueOf(scanner.nextLine());
+
+        System.out.print("Ordre : ");
+        int ordre = scanner.nextInt();
+
+        Candidature nouvelle = new Candidature(ine, idOffreMobilite, date, ordre);
+
+        return nouvelle.saveInDB(con);
     }
 
     public int getId() {
@@ -182,11 +169,11 @@ public static List<Candidature> trouverCandidaturesParEtudiant(Connection con, S
     }
 
     public java.sql.Date getDate() {
-        return Date;
+        return date;
     }
 
     public void setDate(java.sql.Date date) {
-        this.Date = Date;
+        this.date = date;
     }
 
     public int getOrdre() {
