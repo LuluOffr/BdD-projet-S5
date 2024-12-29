@@ -16,7 +16,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
 */
-package fr.insa.toto.moveINSA.gui;
+package fr.insa.toto.moveINSA.moveINSA.gui;
 
 import com.vaadin.flow.component.sidenav.SideNav;
 import com.vaadin.flow.component.sidenav.SideNavItem;
@@ -33,6 +33,12 @@ import fr.insa.toto.moveINSA.gui.vues.RAZBdDPanel;
 import fr.insa.toto.moveINSA.gui.vues.TestDriverPanel;
 import fr.insa.toto.moveINSA.gui.vues.EtudiantCreationPanel;
 import fr.insa.toto.moveINSA.gui.vues.EtudiantsListePanel;
+import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.sidenav.SideNav;
+import com.vaadin.flow.component.sidenav.SideNavItem;
+import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.PWA;
 
 /**
  *
@@ -53,6 +59,52 @@ public class MenuGauche extends SideNav {
         SideNavItem offres = new SideNavItem("offres");
         offres.addItem(new SideNavItem("liste", OffresPanel.class));
         offres.addItem(new SideNavItem("nouvelle", NouvelleOffrePanel.class));
+        
+        // Onglet Classe
+        SideNavItem classes = new SideNavItem("Classes");
+
+        // Ajouter des sous-onglets pour chaque classe
+        String[] classNames = {
+            "GC2", "GC3", "GC4", "GC5",
+            "TP2", "TP3", "TP4", "TP5",
+            "GE2", "GE3", "GE4", "GE5",
+            "GTEE2", "GTEE3", "GTEE4", "GTEE5",
+            "GM2", "GM3", "GM4", "GM5",
+            "PL2", "PL3", "PL4", "PL5",
+            "MIQ2", "MIQ3", "MIQ4", "MIQ5"
+        };
+
+        for (String className : classNames) {
+            // Ajouter un sous-menu pour chaque classe
+            SideNavItem classItem = new SideNavItem(className);
+
+            // Sous-menu : Liste des étudiants de cette classe
+           /* SideNavItem listEtudiantsItem = new SideNavItem(
+                "Liste des étudiants",
+                () -> getUI().ifPresent(ui -> ui.navigate(EtudiantsListePanel.class, "classe=" + className))
+            );
+
+            // Sous-menu : Ajouter un étudiant à cette classe
+            SideNavItem addEtudiantItem = new SideNavItem(
+                "Ajouter un étudiant",
+                () -> getUI().ifPresent(ui -> ui.navigate(EtudiantCreationPanel.class, "classe=" + className))
+            );
+
+            classItem.addItem(listEtudiantsItem);
+            classItem.addItem(addEtudiantItem);*/
+
+            // Ajouter ce sous-menu à l'onglet "Classes"
+            classes.addItem(classItem);
+        }
+
+        // Ajouter l'onglet Classes au menu principal
+        //sideNav.addItem(classes);
+
+        // Ajouter le menu dans l'interface principale
+       // add(sideNav);
+    
+
+
 
         // Menu étudiants
         SideNavItem etudiants = new SideNavItem("étudiants");
