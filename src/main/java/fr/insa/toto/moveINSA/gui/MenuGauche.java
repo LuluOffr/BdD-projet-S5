@@ -58,22 +58,23 @@ public class MenuGauche extends SideNav {
         offres.addItem(new SideNavItem("liste", OffresPanel.class));
         offres.addItem(new SideNavItem("nouvelle (PARTENAIRE)", NouvelleOffrePanel.class));
 
+        // Menu Département
+        
+        SideNavItem departements = new SideNavItem("Départements");
 
+        // Ajouter des sous-onglets pour chaque departement
+        SideNavItem archi = new SideNavItem("Département Architecture");
+        SideNavItem gcivil = new SideNavItem("Génie civil et topographie");
         // Onglet Classe
         SideNavItem classes = new SideNavItem("Classes");
 
         // Ajouter des sous-onglets pour chaque classe
-        String[] classNames = {
+        String[] gcclassNames = {
             "GC2", "GC3", "GC4", "GC5",
-            "TP2", "TP3", "TP4", "TP5",
-            "GE2", "GE3", "GE4", "GE5",
-            "GTEE2", "GTEE3", "GTEE4", "GTEE5",
-            "GM2", "GM3", "GM4", "GM5",
-            "PL2", "PL3", "PL4", "PL5",
-            "MIQ2", "MIQ3", "MIQ4", "MIQ5"
+            "G2", "G3", "G4", "G5"
         };
 
-        for (String className : classNames) {
+        for (String className : gcclassNames) {
             // Ajouter un sous-menu pour chaque classe
             SideNavItem classItem = new SideNavItem(className);
 
@@ -84,13 +85,58 @@ public class MenuGauche extends SideNav {
         classItem.addItem(etudiants);
             // Ajouter ce sous-menu à l'onglet "Classes"
             classes.addItem(classItem);
+            gcivil.addItem(classItem);
         }
+        SideNavItem gelec = new SideNavItem("Génie électrique et énergetique");
+        // Onglet Classe
+        gelec.addItem(classes);
 
-        // Ajouter l'onglet Classes au menu principal
-        //sideNav.addItem(classes);
+        // Ajouter des sous-onglets pour chaque classe
+        String[] geclassNames = {
+            "GE2", "GE3", "GE4", "GE5",
+            "GTEE2", "GTEE3", "GTEE4", "GTEE5"
+        };
 
-        // Ajouter le menu dans l'interface principale
-       // add(sideNav);
+        for (String className : geclassNames) {
+            // Ajouter un sous-menu pour chaque classe
+            SideNavItem classItem = new SideNavItem(className);
+
+            // Menu étudiants
+        SideNavItem etudiants = new SideNavItem("étudiants");
+        etudiants.addItem(new SideNavItem("liste (SRI)", EtudiantsListePanel.class)); 
+        etudiants.addItem(new SideNavItem("nouveau (SRI)", EtudiantCreationPanel.class));
+        classItem.addItem(etudiants);
+            // Ajouter ce sous-menu à l'onglet "Classes"
+            classes.addItem(classItem);
+            gelec.addItem(classItem);
+        }   
+        SideNavItem gmec = new SideNavItem("Mécanique");
+        // Onglet Classe
+        gmec.addItem(classes);
+
+        // Ajouter des sous-onglets pour chaque classe
+        String[] gmclassNames = {
+            "GM2", "GM3", "GM4", "GM5",
+            "PL2", "PL3", "PL4", "PL5",
+            "MIQ2", "MIQ3", "MIQ4", "MIQ5"
+        };
+
+        for (String className : gmclassNames) {
+            // Ajouter un sous-menu pour chaque classe
+            SideNavItem classItem = new SideNavItem(className);
+
+            // Menu étudiants
+        SideNavItem etudiants = new SideNavItem("étudiants");
+        etudiants.addItem(new SideNavItem("liste (SRI)", EtudiantsListePanel.class)); 
+        etudiants.addItem(new SideNavItem("nouveau (SRI)", EtudiantCreationPanel.class));
+        classItem.addItem(etudiants);
+            // Ajouter ce sous-menu à l'onglet "Classes"
+            classes.addItem(classItem);
+            gmec.addItem(classItem);
+        }   
+        
+        departements.addItem(archi,gcivil,gelec,gmec);
+
         
         
          
@@ -124,6 +170,6 @@ public class MenuGauche extends SideNav {
         jeux.addItem(new SideNavItem("trouve", TrouveEntier.class));
 
         // Ajout de tous les menus
-        this.addItem(main, partenaires, offres,classes, candidature , attribution, jeux, debug);
+        this.addItem(main, departements,partenaires, offres,  candidature , attribution, jeux, debug);
     }
 }
