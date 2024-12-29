@@ -33,6 +33,10 @@ import fr.insa.toto.moveINSA.gui.vues.RAZBdDPanel;
 import fr.insa.toto.moveINSA.gui.vues.TestDriverPanel;
 import fr.insa.toto.moveINSA.gui.vues.EtudiantCreationPanel;
 import fr.insa.toto.moveINSA.gui.vues.EtudiantsListePanel;
+import fr.insa.toto.moveINSA.gui.vues.CandidaturePanel;
+import fr.insa.toto.moveINSA.gui.vues.AttributionSRI;
+import fr.insa.toto.moveINSA.gui.vues.AttributionEtudiant;
+import fr.insa.toto.moveINSA.gui.vues.CandidatureListePanel;
 
 /**
  *
@@ -47,17 +51,64 @@ public class MenuGauche extends SideNav {
         // Menu partenaires
         SideNavItem partenaires = new SideNavItem("partenaires");
         partenaires.addItem(new SideNavItem("liste", PartenairesPanel.class));
-        partenaires.addItem(new SideNavItem("nouveau", NouveauPartenairePanel.class));
-
+        partenaires.addItem(new SideNavItem("nouveau (PARTENAIRE)", NouveauPartenairePanel.class));
+        
         // Menu offres
         SideNavItem offres = new SideNavItem("offres");
         offres.addItem(new SideNavItem("liste", OffresPanel.class));
-        offres.addItem(new SideNavItem("nouvelle", NouvelleOffrePanel.class));
+        offres.addItem(new SideNavItem("nouvelle (PARTENAIRE)", NouvelleOffrePanel.class));
 
-        // Menu étudiants
+
+        // Onglet Classe
+        SideNavItem classes = new SideNavItem("Classes");
+
+        // Ajouter des sous-onglets pour chaque classe
+        String[] classNames = {
+            "GC2", "GC3", "GC4", "GC5",
+            "TP2", "TP3", "TP4", "TP5",
+            "GE2", "GE3", "GE4", "GE5",
+            "GTEE2", "GTEE3", "GTEE4", "GTEE5",
+            "GM2", "GM3", "GM4", "GM5",
+            "PL2", "PL3", "PL4", "PL5",
+            "MIQ2", "MIQ3", "MIQ4", "MIQ5"
+        };
+
+        for (String className : classNames) {
+            // Ajouter un sous-menu pour chaque classe
+            SideNavItem classItem = new SideNavItem(className);
+
+            // Menu étudiants
         SideNavItem etudiants = new SideNavItem("étudiants");
-        etudiants.addItem(new SideNavItem("liste", EtudiantsListePanel.class)); // Liste des étudiants
-        etudiants.addItem(new SideNavItem("nouveau", EtudiantCreationPanel.class)); // Création d'un étudiant
+        etudiants.addItem(new SideNavItem("liste (SRI)", EtudiantsListePanel.class)); 
+        etudiants.addItem(new SideNavItem("nouveau (SRI)", EtudiantCreationPanel.class));
+        classItem.addItem(etudiants);
+            // Ajouter ce sous-menu à l'onglet "Classes"
+            classes.addItem(classItem);
+        }
+
+        // Ajouter l'onglet Classes au menu principal
+        //sideNav.addItem(classes);
+
+        // Ajouter le menu dans l'interface principale
+       // add(sideNav);
+        
+        
+         
+        
+        //Menu candidature
+        SideNavItem candidature = new SideNavItem("candidature");
+        candidature.addItem(new SideNavItem("Candidature (ETUDIANT)", CandidaturePanel.class));
+        candidature.addItem(new SideNavItem("Liste Candidature (SRI)", CandidatureListePanel.class));
+        
+        
+        // Menu attribution
+        SideNavItem attribution = new SideNavItem("attribution");
+        attribution.addItem(new SideNavItem("attribution (SRI)", AttributionSRI.class)); 
+        attribution.addItem(new SideNavItem("attribution (ETUDIANT)", AttributionEtudiant.class)); 
+
+        
+        //Menu candidature
+        //SideNavItem Candidature = new SideNavItem("Candidature (ETUDIANT)");
 
         // Menu debug
         SideNavItem debug = new SideNavItem("debug");
@@ -73,6 +124,6 @@ public class MenuGauche extends SideNav {
         jeux.addItem(new SideNavItem("trouve", TrouveEntier.class));
 
         // Ajout de tous les menus
-        this.addItem(main, partenaires, offres, etudiants, jeux, debug);
+        this.addItem(main, partenaires, offres,classes, candidature , attribution, jeux, debug);
     }
 }

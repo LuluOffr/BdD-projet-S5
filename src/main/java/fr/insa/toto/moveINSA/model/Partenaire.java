@@ -147,6 +147,10 @@ public int saveInDB(Connection con) throws SQLException {
         return res;
     }
 }
+
+    
+    
+    
 public static Optional<Partenaire> trouvePartaire(Connection con, String refPart) throws SQLException {
     try (PreparedStatement pst = con.prepareStatement(
             "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire")) {
@@ -164,6 +168,29 @@ public static Optional<Partenaire> trouvePartaire(Connection con, String refPart
             return Optional.empty();
         }
     }
+}
+
+public static Optional<Partenaire> trouverParId(Connection con, int id) throws SQLException {
+    String query = "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire WHERE id = ?";
+    try (PreparedStatement pst = con.prepareStatement(query)) {
+        pst.setInt(1, id);
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                return Optional.of(new Partenaire(
+                        rs.getInt("id"),
+                        rs.getString("refPartenaire"),
+                        rs.getString("Pays"),
+                        rs.getString("Nom"),
+                        rs.getString("Ville")
+                ));
+            }
+        }
+    }
+    return Optional.empty(); // Si aucun partenaire n'est trouvé
+}
+
+public Optional<Partenaire> getPartenaire(Connection con) throws SQLException {
+    return Partenaire.trouverParId(con, this.id); // `proposePar` est l'ID du partenaire
 }
 
 public static int creeConsole(Connection con) throws SQLException {
@@ -224,23 +251,6 @@ public void setVille(String Ville) {
         return id;
     }
 
-public static Optional<Partenaire> rechercher(Connection con, String refPartenaire) throws SQLException {
-    String query = "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire WHERE refPartenaire = ?";
-    try (PreparedStatement pst = con.prepareStatement(query)) {
-        pst.setString(1, refPartenaire);
-        try (ResultSet rs = pst.executeQuery()) {
-            if (rs.next()) {
-                return Optional.of(new Partenaire(
-                        rs.getInt("id"),
-                        rs.getString("refPartenaire"),
-                        rs.getString("Pays"),
-                        rs.getString("Nom"),
-                        rs.getString("Ville")
-                ));
-            }
-        }
-    }
-    return Optional.empty(); // Si aucun partenaire trouvé
-}
+
 
 }

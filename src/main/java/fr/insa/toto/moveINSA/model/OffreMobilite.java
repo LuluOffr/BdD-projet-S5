@@ -105,6 +105,28 @@ public class OffreMobilite {
             return res;
         }
     }
+    
+    
+    public Partenaire getPartenaire(Connection con) throws SQLException {
+    String query = "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire WHERE id = ?";
+    try (PreparedStatement pst = con.prepareStatement(query)) {
+        pst.setInt(1, this.proposePar); // Utilise l'ID du partenaire
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                return new Partenaire(
+                        rs.getInt("id"),
+                        rs.getString("refPartenaire"),
+                        rs.getString("Pays"),
+                        rs.getString("Nom"),
+                        rs.getString("Ville")
+                );
+            }
+        }
+    }
+    throw new SQLException("Partenaire introuvable pour l'offre de mobilité avec ID : " + this.proposePar);
+}
+    
+
 
     public static int creeConsole(Connection con) throws SQLException {
         Partenaire p = Partenaire.selectInConsole(con);
@@ -116,8 +138,21 @@ public class OffreMobilite {
     /**
      * @return the id
      */
+
+    // Getters
     public int getId() {
         return id;
     }
+
+    public int getNbrPlaces() {
+        return nbrPlaces;
+    }
+    
+    public int getProposePar() {
+        return proposePar;
+    }
+
+    
+
 
 }
