@@ -26,7 +26,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Classe "miroir" de la table offremobilite.
@@ -108,29 +107,23 @@ public class OffreMobilite {
     }
     
     
-    public static Optional<Partenaire> trouverParId(Connection con, int id) throws SQLException {
+    public Partenaire getPartenaire(Connection con) throws SQLException {
     String query = "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire WHERE id = ?";
     try (PreparedStatement pst = con.prepareStatement(query)) {
-        pst.setInt(1, id);
+        pst.setInt(1, this.proposePar); // Utilise l'ID du partenaire
         try (ResultSet rs = pst.executeQuery()) {
             if (rs.next()) {
-                return Optional.of(new Partenaire(
-                    rs.getInt("id"),
-                    rs.getString("refPartenaire"),
-                    rs.getString("Pays"),
-                    rs.getString("Nom"),
-                    rs.getString("Ville")
-                ));
+                return new Partenaire(
+                        rs.getInt("id"),
+                        rs.getString("refPartenaire"),
+                        rs.getString("Pays"),
+                        rs.getString("Nom"),
+                        rs.getString("Ville")
+                );
             }
         }
     }
-    return Optional.empty();
-}
-    
-
-    
-public Optional<Partenaire> getPartenaire(Connection con) throws SQLException {
-    return Partenaire.trouverParId(con, this.proposePar);
+    throw new SQLException("Partenaire introuvable pour l'offre de mobilité avec ID : " + this.proposePar);
 }
     
 

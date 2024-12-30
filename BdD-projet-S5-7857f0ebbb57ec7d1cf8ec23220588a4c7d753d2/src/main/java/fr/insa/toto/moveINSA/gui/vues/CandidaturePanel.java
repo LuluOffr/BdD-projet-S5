@@ -43,7 +43,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-
 /**
  *
  * @author lucas
@@ -107,17 +106,13 @@ public class CandidaturePanel extends VerticalLayout {
 
         choixPartenaires = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
-            // Capturer l'index `i` dans une variable finale pour l'utiliser dans une lambda
-            final int ordre = i;
-
-            ComboBox<OffreMobilite> comboBox = new ComboBox<>("Établissement choisi n°" + ordre);
+            ComboBox<OffreMobilite> comboBox = new ComboBox<>("Établissement choisi n°" + i);
             comboBox.setItems(offres);
 
             // Générer les libellés des offres
             comboBox.setItemLabelGenerator(offre -> {
                 try (Connection localCon = ConnectionPool.getConnection()) {
-                    Partenaire partenaire = offre.getPartenaire(localCon)
-                        .orElseThrow(() -> new SQLException("Partenaire introuvable pour l'offre : " + offre.getId()));
+                    Partenaire partenaire = offre.getPartenaire(localCon); // Récupérer le partenaire associé
                     return partenaire.getRefPartenaire() + " (" + offre.getNbrPlaces() + " places restantes)";
                 } catch (SQLException ex) {
                     Notification.show("Erreur lors de la récupération du partenaire : " + ex.getLocalizedMessage());
@@ -125,27 +120,28 @@ public class CandidaturePanel extends VerticalLayout {
                 }
             });
 
-            // Ajouter un bouton pour valider ce choix individuellement
-            Button enregistrerBouton = new Button("Enregistrer ce choix", event -> {
-                try (Connection localCon = ConnectionPool.getConnection()) {
-                    enregistrerCandidaturesIndividuellement(localCon, comboBox, ordre);
-                } catch (SQLException ex) {
-                    Notification.show("Erreur lors de l'enregistrement : " + ex.getLocalizedMessage());
-                    ex.printStackTrace();
-                }
-            });
-
-            // Ajouter le comboBox et le bouton
+            // Vérifier les doublons lors des sélections
+            comboBox.addValueChangeListener(event -> checkDuplicates());
             choixPartenaires.add(comboBox);
-            this.add(comboBox, enregistrerBouton);
+            this.add(comboBox);
         }
+
+        // Bouton pour valider les choix
+        validerButton = new Button("Valider mes choix", event -> {
+            try (Connection localCon = ConnectionPool.getConnection()) {
+                enregistrerCandidatures(localCon);
+            } catch (SQLException ex) {
+                Notification.show("Erreur lors de l'enregistrement des candidatures : " + ex.getLocalizedMessage());
+                ex.printStackTrace();
+            }
+        });
+        this.add(validerButton);
 
     } catch (SQLException e) {
         Notification.show("Erreur lors du chargement des offres : " + e.getLocalizedMessage());
         e.printStackTrace();
     }
 }
-
 
     private void checkDuplicates() {
         List<OffreMobilite> selections = new ArrayList<>();
@@ -160,34 +156,34 @@ public class CandidaturePanel extends VerticalLayout {
         }
     }
 
-private void enregistrerCandidaturesIndividuellement(Connection con, ComboBox<OffreMobilite> comboBox, int ordre) {
-    OffreMobilite selection = comboBox.getValue();
-    if (selection != null) {
-        try {
-            // Vérification et récupération du partenaire associé
-            Partenaire partenaire = selection.getPartenaire(con)
-                .orElseThrow(() -> new SQLException("Partenaire introuvable pour l'offre sélectionnée"));
+private void enregistrerCandidatures(Connection con) {
+    try {
+        for (int i = 0; i < choixPartenaires.size(); i++) {
+            ComboBox<OffreMobilite> comboBox = choixPartenaires.get(i);
+            OffreMobilite selection = comboBox.getValue();
+            if (selection == null) continue;
+
+            // Récupérer le Partenaire associé
+            Partenaire partenaire = selection.getPartenaire(con);
+if (partenaire == null) {
+    throw new SQLException("Partenaire introuvable pour l'offre sélectionnée");
+}
+            // Récupérer le refPartenaire pour enregistrer dans idOffreMobilité
             String refPartenaire = partenaire.getRefPartenaire();
 
-            // Création de la candidature
+            // Enregistrer la candidature
             Candidature candidature = new Candidature(
-                etudiant.getIne(),
-                refPartenaire, // Associer le refPartenaire comme idOffreMobilité
-                Date.valueOf(LocalDate.now()),
-                ordre
+                etudiant.getIne(), // INE de l'étudiant
+                refPartenaire,     // Nom du partenaire
+                Date.valueOf(LocalDate.now()), // Date actuelle
+                i + 1              // Ordre
             );
-
-            // Sauvegarde dans la base de données
             candidature.saveInDB(con);
-
-            // Confirmation de l'enregistrement
-            Notification.show("Candidature enregistrée avec succès pour " + refPartenaire, 3000, Notification.Position.BOTTOM_START);
-        } catch (SQLException ex) {
-            Notification.show("Erreur lors de l'enregistrement : " + ex.getLocalizedMessage());
-            ex.printStackTrace();
         }
-    } else {
-        Notification.show("Aucune sélection effectuée pour l'ordre " + ordre);
+        Notification.show("Candidatures enregistrées avec succès !");
+    } catch (SQLException e) {
+        Notification.show("Erreur lors de l'enregistrement des candidatures : " + e.getLocalizedMessage());
+        e.printStackTrace();
     }
 }
 }

@@ -75,33 +75,32 @@ public class CandidatureListePanel extends VerticalLayout {
     }
 
     private void showCandidatureList() {
-    if (isAuthenticated) {
-        try (Connection con = ConnectionPool.getConnection()) {
-            List<Candidature> candidatures = Candidature.toutesLesCandidatures(con);
+        if (isAuthenticated) {
+            try (Connection con = ConnectionPool.getConnection()) {
+                // Récupérer la liste des candidatures depuis la base de données
+                List<Candidature> candidatures = Candidature.toutesLesCandidatures(con);
 
-            // Vérifiez les candidatures récupérées
-            candidatures.forEach(candidature -> 
-                System.out.println("Candidature: INE=" + candidature.getIne() +
-                        ", idOffreMobilité=" + candidature.getIdOffreMobilité() +
-                        ", Date=" + candidature.getDate() +
-                        ", Ordre=" + candidature.getOrdre())
-            );
+                // Créer un grid pour afficher les candidatures
+                grid = new Grid<>(Candidature.class, false);
 
-            grid = new Grid<>(Candidature.class, false);
-            grid.addColumn(Candidature::getIne).setHeader("INE");
-            grid.addColumn(Candidature::getIdOffreMobilité).setHeader("ID Offre Mobilité");
-            grid.addColumn(Candidature::getDate).setHeader("Date");
-            grid.addColumn(Candidature::getOrdre).setHeader("Ordre");
+                // Ajouter des colonnes spécifiques
+                grid.addColumn(Candidature::getIne).setHeader("INE");
+                grid.addColumn(Candidature::getIdOffreMobilité).setHeader("ID Offre Mobilité");
+                grid.addColumn(Candidature::getDate).setHeader("Date");
+                grid.addColumn(Candidature::getOrdre).setHeader("Ordre");
 
-            grid.setItems(candidatures);
-            contentLayout.removeAll();
-            contentLayout.add(new Paragraph("Liste des candidatures :"));
-            contentLayout.add(grid);
+                // Ajouter les données au grid
+                grid.setItems(candidatures);
 
-        } catch (SQLException ex) {
-            Notification.show("Erreur : Impossible de charger les candidatures. Détails : " + ex.getLocalizedMessage());
-            ex.printStackTrace();
+                // Ajouter le grid au panneau principal
+                contentLayout.removeAll(); // Nettoyer le contenu précédent
+                contentLayout.add(new Paragraph("Liste des candidatures :"));
+                contentLayout.add(grid);
+
+            } catch (SQLException ex) {
+                Notification.show("Erreur : Impossible de charger les candidatures. Détails : " + ex.getLocalizedMessage());
+                ex.printStackTrace();
+            }
         }
     }
-}
 }
