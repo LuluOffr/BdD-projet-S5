@@ -46,7 +46,7 @@ public class MenuGauche extends SideNav {
 
     public MenuGauche() {
         // Menu principal
-        SideNavItem main = new SideNavItem("main", VuePrincipale.class);
+        SideNavItem main = new SideNavItem("Menu", VuePrincipale.class);
 
         // Menu partenaires
         SideNavItem partenaires = new SideNavItem("partenaires");
@@ -170,6 +170,6 @@ public class MenuGauche extends SideNav {
         jeux.addItem(new SideNavItem("trouve", TrouveEntier.class));
 
         // Ajout de tous les menus
-        this.addItem(main, departements,partenaires, offres,  candidature , attribution, jeux, debug);
+        this.addItem(main, departements,partenaires, offres,  candidature , attribution, debug); // , jeux   (que j'ai enlevé car rien a faire dans ptrojet final)
     }
 }
