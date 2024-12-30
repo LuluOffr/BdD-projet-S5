@@ -118,7 +118,7 @@ public class CandidaturePanel extends VerticalLayout {
                 try (Connection localCon = ConnectionPool.getConnection()) {
                     Partenaire partenaire = offre.getPartenaire(localCon)
                         .orElseThrow(() -> new SQLException("Partenaire introuvable pour l'offre : " + offre.getId()));
-                    return partenaire.getRefPartenaire() + " (" + offre.getNbrPlaces() + " places restantes)";
+                    return partenaire.getRefPartenaire() + " (" + offre.getNbrPlaces() + " places)";
                 } catch (SQLException ex) {
                     Notification.show("Erreur lors de la récupération du partenaire : " + ex.getLocalizedMessage());
                     return "Erreur : données non disponibles";

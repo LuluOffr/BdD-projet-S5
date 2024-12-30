@@ -112,7 +112,7 @@ public class OffreMobilite {
         }
     }
     
-    
+ /*   
     public static Optional<Partenaire> trouverParId(Connection con, int id) throws SQLException {
     String query = "SELECT id, refPartenaire, Pays, Nom, Ville FROM partenaire WHERE id = ?";
     try (PreparedStatement pst = con.prepareStatement(query)) {
@@ -131,7 +131,7 @@ public class OffreMobilite {
     }
     return Optional.empty();
 }
-    
+*/    
 
     
 public Optional<Partenaire> getPartenaire(Connection con) throws SQLException {

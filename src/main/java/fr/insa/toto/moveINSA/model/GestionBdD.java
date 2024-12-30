@@ -31,7 +31,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-import org.h2.jdbc.meta.DatabaseMetaServer;
 import java.util.Optional;
 
 /**

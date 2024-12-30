@@ -128,6 +128,7 @@ public static Optional<Candidature> trouveCandidature(Connection con, String ine
     }
 }
 
+/*
 public static List<Candidature> trouverCandidaturesParEtudiant(Connection con, String ine) throws SQLException {
     String query = "SELECT ine, idOffreMobilité, Date, ordre FROM candidature WHERE ine = ?";
     try (PreparedStatement pst = con.prepareStatement(query)) {
@@ -145,6 +146,7 @@ public static List<Candidature> trouverCandidaturesParEtudiant(Connection con, S
         return candidatures;
     }
 }
+*/
 
 public static List<Candidature> toutesLesCandidatures(Connection con) throws SQLException {
     String query = "SELECT ine, idOffreMobilité, Date, ordre FROM candidature";
