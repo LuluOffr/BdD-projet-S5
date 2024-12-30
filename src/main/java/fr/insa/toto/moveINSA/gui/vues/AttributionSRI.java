@@ -162,15 +162,15 @@ public class AttributionSRI extends VerticalLayout {
         }
     }
 
-    private void traiterCandidature(Connection con, Candidature candidature, boolean accepter) {
-        try {
-            // Insérez ici la logique pour enregistrer l'action (acceptation ou refus)
-            String statut = accepter ? "acceptée" : "refusée";
-            Notification.show("La candidature pour l'établissement " + candidature.getIdOffreMobilité() + " a été " + statut + ".");
-            // Vous pouvez enregistrer cette décision dans une nouvelle table ou mettre à jour une colonne "statut" dans la table Candidature
-        } catch (Exception ex) {
-            Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
-            ex.printStackTrace();
-        }
+    private void traiterCandidature(Connection con, Candidature candidature, String statut) {
+    try {
+        // Mise à jour du statut dans la base de données
+        Candidature.mettreAJourStatut(con, candidature.getIne(), candidature.getOrdre(), statut);
+        Notification.show("La candidature pour l'établissement " + candidature.getIdOffreMobilité() + " a été " + statut.toLowerCase() + ".");
+        afficherProfilEtudiant(con); // Rafraîchir la liste après mise à jour
+    } catch (SQLException ex) {
+        Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
+        ex.printStackTrace();
     }
+}
 }
