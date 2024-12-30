@@ -84,7 +84,8 @@ public class CandidatureListePanel extends VerticalLayout {
                 System.out.println("Candidature: INE=" + candidature.getIne() +
                         ", idOffreMobilité=" + candidature.getIdOffreMobilité() +
                         ", Date=" + candidature.getDate() +
-                        ", Ordre=" + candidature.getOrdre())
+                        ", Ordre=" + candidature.getOrdre()+
+                        ", statut=" + candidature.getStatut())
             );
 
             grid = new Grid<>(Candidature.class, false);
@@ -92,6 +93,7 @@ public class CandidatureListePanel extends VerticalLayout {
             grid.addColumn(Candidature::getIdOffreMobilité).setHeader("ID Offre Mobilité");
             grid.addColumn(Candidature::getDate).setHeader("Date");
             grid.addColumn(Candidature::getOrdre).setHeader("Ordre");
+            grid.addColumn(Candidature::getStatut).setHeader("Statut");
 
             grid.setItems(candidatures);
             contentLayout.removeAll();
