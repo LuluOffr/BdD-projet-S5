@@ -40,7 +40,10 @@ import java.util.List;
 import java.util.Optional;
 
 /**
+ * 
+ * @author lucas
  * Classe pour gérer les candidatures des étudiants par le SRI.
+ * 
  */
 @PageTitle("Attribution des candidatures (SRI)")
 @Route(value = "attributions/sri", layout = MainLayout.class)
