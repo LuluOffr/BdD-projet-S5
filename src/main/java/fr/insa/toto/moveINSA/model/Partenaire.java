@@ -78,6 +78,9 @@ public class Partenaire implements Serializable{
      * donnée.
      *
      * @param refPartenaire
+     * @param Pays
+     * @param Nom
+     * @param Ville
      */
     public Partenaire(String refPartenaire, String Pays, String Nom, String Ville) {
         this(-1, refPartenaire, Pays, Nom, Ville);
@@ -87,6 +90,10 @@ public class Partenaire implements Serializable{
      * création d'un Partenaire retrouvé dans la base de donnée.
      *
      * @param refPartenaire
+     * @param id
+     * @param Pays
+     * @param Ville
+     * @param Nom
      */
     public Partenaire(int id, String refPartenaire, String Pays, String Nom, String Ville) {
         this.id = id;

@@ -46,6 +46,8 @@ public class OffreMobilite {
     /**
      * création d'une nouvelle Offre en mémoire, non existant dans la Base de
      * donnée.
+     * @param nbrPlaces
+     * @param proposePar
      */
     public OffreMobilite(int nbrPlaces, int proposePar) {
         this(-1, nbrPlaces, proposePar);
@@ -53,6 +55,9 @@ public class OffreMobilite {
 
     /**
      * création d'une Offre retrouvée dans la base de donnée.
+     * @param nbrPlaces
+     * @param id
+     * @param proposePar
      */
     public OffreMobilite(int id, int nbrPlaces, int proposePar) {
         this.id = id;
