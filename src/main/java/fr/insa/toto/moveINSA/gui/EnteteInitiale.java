@@ -18,26 +18,58 @@ along with CoursBeuvron.  If not, see <http://www.gnu.org/licenses/>.
  */
 package fr.insa.toto.moveINSA.gui;
 
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.textfield.TextField;
-import fr.insa.beuvron.vaadin.utils.ConnectionPool;
-import fr.insa.toto.moveINSA.gui.session.SessionInfo;
-import fr.insa.toto.moveINSA.model.Partenaire;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.Optional;
+import com.vaadin.flow.server.StreamResource;
 
 /**
- *
- * @author francois
+ * Classe affichant le bandeau en haut de l'application MoveINSA.
  */
 public class EnteteInitiale extends HorizontalLayout {
 
-    private TextField tfNom;
+    public EnteteInitiale() {
+        // Définir la couleur de fond du bandeau
+        this.getStyle().set("background-color", "#d50000"); // Rouge thème INSA
+        this.getStyle().set("color", "white"); // Texte blanc
+        this.getStyle().set("padding", "10px");
+        this.getStyle().set("width", "100%");
+        this.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        // Partie gauche : Texte "MoveINSA"
+        Span titre = new Span("MoveINSA");
+        titre.getStyle().set("font-size", "24px");
+        titre.getStyle().set("font-weight", "bold");
+        titre.getStyle().set("margin-left", "20px");
+
+        // Partie droite : Logo INSA Strasbourg
+        StreamResource logoResource = new StreamResource("insa-logo.jpg",
+                () -> getClass().getResourceAsStream("/images/insa-logo.jpg")); // Chemin du logo
+        Image logo = new Image(logoResource, "INSA Strasbourg");
+        logo.setWidth("100px");
+        logo.setHeight("auto");
+        logo.getStyle().set("margin-right", "20px");
+
+        // Ajouter les composants
+        this.add(titre);
+        this.add(logo);
+
+        // Espacement entre les deux parties
+        this.expand(titre);
+    }
+}
+    
+    
+    
+    
+    
+    
+    
+    
+//ce qu'il y avait de base
+    
+    /*private TextField tfNom;
     private Button bLogin;
     private Button bLogout;
 
@@ -79,5 +111,4 @@ public class EnteteInitiale extends HorizontalLayout {
             this.add(this.tfNom, this.bLogin);
         }
     }
-
-}
+*/
