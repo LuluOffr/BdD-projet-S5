@@ -27,35 +27,38 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.PasswordField;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import fr.insa.beuvron.vaadin.utils.ConnectionPool;
 import fr.insa.toto.moveINSA.gui.MainLayout;
 import fr.insa.toto.moveINSA.model.Candidature;
 import fr.insa.toto.moveINSA.model.Etudiant;
+import fr.insa.toto.moveINSA.model.OffreMobilite;
+import fr.insa.toto.moveINSA.model.Partenaire;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Classe permettant au SRI de gérer les candidatures des étudiants.
+ *
+ * @author lucas
  */
 @PageTitle("Attribution des candidatures (SRI)")
 @Route(value = "attributions/sri", layout = MainLayout.class)
 public class AttributionSRI extends VerticalLayout {
 
-    private static final String PASSWORD = "SRI2024"; // Mot de passe requis pour accéder à la fonctionnalité
-    private boolean isAuthenticated = false; // Vérifie si le SRI est authentifié
-    private Etudiant etudiant; // Étudiant actuellement sélectionné
-    private VerticalLayout contentLayout; // Conteneur pour afficher les informations
+    private static final String PASSWORD = "SRI2024"; // Mot de passe requis
+    private boolean isAuthenticated = false; // Indique si l'utilisateur a été authentifié
+    private Etudiant etudiant; // Étudiant sélectionné
+    private VerticalLayout contentLayout; // Contient le profil de l'étudiant et les candidatures
 
     public AttributionSRI() {
         this.add(new H3("Espace d'attribution des candidatures (SRI)"));
 
-        // Champ pour entrer le mot de passe
+        // Mot de passe pour accéder à l'espace SRI
         PasswordField passwordField = new PasswordField("Mot de passe");
         Button validatePasswordButton = new Button("Valider", event -> {
             if (PASSWORD.equals(passwordField.getValue())) {
@@ -67,23 +70,21 @@ public class AttributionSRI extends VerticalLayout {
             }
         });
 
+        // Disposition pour le mot de passe
         HorizontalLayout passwordLayout = new HorizontalLayout(passwordField, validatePasswordButton);
         this.add(passwordLayout);
 
-        // Conteneur pour afficher les informations une fois authentifié
+        // Conteneur pour les informations
         contentLayout = new VerticalLayout();
         this.add(contentLayout);
     }
 
-    /**
-     * Affiche un formulaire de recherche pour trouver un étudiant par son INE.
-     */
     private void afficherRechercheEtudiant() {
         if (!isAuthenticated) return;
 
         contentLayout.removeAll();
 
-        // Section pour rechercher un étudiant par son INE
+        // Section pour rechercher un étudiant par INE
         TextField ineField = new TextField("Entrez l'INE de l'étudiant");
         Button rechercherButton = new Button("Rechercher", event -> {
             String ine = ineField.getValue();
@@ -111,11 +112,6 @@ public class AttributionSRI extends VerticalLayout {
         contentLayout.add(new Paragraph("Recherchez un étudiant :"), rechercheLayout);
     }
 
-    /**
-     * Affiche le profil de l'étudiant sélectionné ainsi que ses candidatures.
-     *
-     * @param con Connexion à la base de données
-     */
     private void afficherProfilEtudiant(Connection con) {
         contentLayout.removeAll();
 
@@ -124,10 +120,9 @@ public class AttributionSRI extends VerticalLayout {
         contentLayout.add(new Paragraph("Nom : " + etudiant.getNom()));
         contentLayout.add(new Paragraph("Prénom : " + etudiant.getPrenom()));
         contentLayout.add(new Paragraph("Classe : " + etudiant.getClasse()));
-        contentLayout.add(new Paragraph("Score : " + etudiant.getScore()));
 
+        // Récupération des candidatures de l'étudiant
         try {
-            // Récupération des candidatures de l'étudiant
             List<Candidature> candidatures = Candidature.trouverCandidaturesParEtudiant(con, etudiant.getIne());
             if (candidatures.isEmpty()) {
                 contentLayout.add(new Paragraph("Aucune candidature trouvée pour cet étudiant."));
@@ -136,18 +131,26 @@ public class AttributionSRI extends VerticalLayout {
 
             contentLayout.add(new H3("Candidatures de l'étudiant :"));
 
-            // Création d'une grille pour afficher les candidatures
             Grid<Candidature> grid = new Grid<>(Candidature.class, false);
-
-            grid.addColumn(Candidature::getIdOffreMobilité).setHeader("Établissement demandé");
+            grid.addColumn(new ValueProvider<Candidature, Object>() {
+                @Override
+                public Object apply(Candidature candidature) {
+                    try {
+            Optional<Partenaire> partenaire = OffreMobilite.getPartenaireParOffre(con, Integer.parseInt(candidature.getIdOffreMobilité()));
+            // Vérifiez si le partenaire est présent dans l'Optional
+            return partenaire.map(Partenaire::getRefPartenaire).orElse("Partenaire inconnu");
+        } catch (SQLException e) {
+            return "Erreur : " + e.getLocalizedMessage();
+        }
+    
+                }
+            }).setHeader("Établissement demandé");
             grid.addColumn(Candidature::getOrdre).setHeader("Ordre");
             grid.addColumn(Candidature::getDate).setHeader("Date");
-            grid.addColumn(Candidature::getStatut).setHeader("Statut");
 
-            // Ajouter des boutons "Accepter" et "Refuser" pour chaque candidature
             grid.addComponentColumn(candidature -> {
-                Button accepterButton = new Button("Accepter", event -> traiterCandidature(con, candidature, "ACCEPTE"));
-                Button refuserButton = new Button("Refuser", event -> traiterCandidature(con, candidature, "REFUSE"));
+                Button accepterButton = new Button("Accepter", event -> traiterCandidature(con, candidature, true));
+                Button refuserButton = new Button("Refuser", event -> traiterCandidature(con, candidature, false));
                 return new HorizontalLayout(accepterButton, refuserButton);
             }).setHeader("Actions");
 
@@ -159,25 +162,15 @@ public class AttributionSRI extends VerticalLayout {
         }
     }
 
-    /**
-     * Met à jour le statut d'une candidature (acceptée ou refusée).
-     *
-     * @param con         Connexion à la base de données
-     * @param candidature Candidature à traiter
-     * @param statut      Nouveau statut (ACCEPTE ou REFUSE)
-     */
-    private void traiterCandidature(Connection con, Candidature candidature, String statut) {
-    try (PreparedStatement pst = con.prepareStatement(
-            "UPDATE candidature SET statut = ? WHERE ine = ? AND ordre = ?")) {
-        pst.setString(1, statut);
-        pst.setString(2, candidature.getIne());
-        pst.setInt(3, candidature.getOrdre());
-        pst.executeUpdate();
-        Notification.show("La candidature pour l'établissement " + candidature.getIdOffreMobilité() + " a été " + statut.toLowerCase() + ".");
-        afficherProfilEtudiant(con); // Rafraîchir la liste après mise à jour
-    } catch (SQLException ex) {
-        Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
-        ex.printStackTrace();
+    private void traiterCandidature(Connection con, Candidature candidature, boolean accepter) {
+        try {
+            // Insérez ici la logique pour enregistrer l'action (acceptation ou refus)
+            String statut = accepter ? "acceptée" : "refusée";
+            Notification.show("La candidature pour l'établissement " + candidature.getIdOffreMobilité() + " a été " + statut + ".");
+            // Vous pouvez enregistrer cette décision dans une nouvelle table ou mettre à jour une colonne "statut" dans la table Candidature
+        } catch (Exception ex) {
+            Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
+            ex.printStackTrace();
+        }
     }
-}
 }

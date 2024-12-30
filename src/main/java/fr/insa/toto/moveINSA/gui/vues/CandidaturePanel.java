@@ -188,8 +188,7 @@ private void doubloncand() {
                         etudiant.getIne(),
                         refPartenaire, // Associer le refPartenaire comme idOffreMobilité
                         Date.valueOf(LocalDate.now()),
-                        ordre,
-                         "Attente"
+                        ordre
                 );
 
                 // Sauvegarde dans la base de données
