@@ -49,7 +49,7 @@ public class Candidature implements Serializable {
     /**
      * Création d'une Candidature retrouvée dans la base de données.
      *
-     * @param id Identifiant unique de la candidature
+     * @param id Identifiant unique de la candidature// -> pas utilisé pour l'instant !!!!!
      * @param ine INE de l'étudiant
      * @param idOffreMobilite Référence de l'offre de mobilité
      * @param date Date de la candidature

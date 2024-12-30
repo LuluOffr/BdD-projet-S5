@@ -167,16 +167,17 @@ public class AttributionSRI extends VerticalLayout {
      * @param statut      Nouveau statut (ACCEPTE ou REFUSE)
      */
     private void traiterCandidature(Connection con, Candidature candidature, String statut) {
-        try (PreparedStatement pst = con.prepareStatement(
-                "UPDATE candidature SET statut = ? WHERE id = ?")) {
-            pst.setString(1, statut);
-            pst.setInt(2, candidature.getId());
-            pst.executeUpdate();
-            Notification.show("La candidature pour l'établissement " + candidature.getIdOffreMobilité() + " a été " + statut.toLowerCase() + ".");
-            afficherProfilEtudiant(con); // Rafraîchir la liste après mise à jour
-        } catch (SQLException ex) {
-            Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
-            ex.printStackTrace();
-        }
+    try (PreparedStatement pst = con.prepareStatement(
+            "UPDATE candidature SET statut = ? WHERE ine = ? AND ordre = ?")) {
+        pst.setString(1, statut);
+        pst.setString(2, candidature.getIne());
+        pst.setInt(3, candidature.getOrdre());
+        pst.executeUpdate();
+        Notification.show("La candidature pour l'établissement " + candidature.getIdOffreMobilité() + " a été " + statut.toLowerCase() + ".");
+        afficherProfilEtudiant(con); // Rafraîchir la liste après mise à jour
+    } catch (SQLException ex) {
+        Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
+        ex.printStackTrace();
     }
+}
 }
