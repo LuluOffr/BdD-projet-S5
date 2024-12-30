@@ -136,8 +136,23 @@ public class AttributionSRI extends VerticalLayout {
 
             // Ajouter des boutons "Accepter" et "Refuser" pour chaque candidature
             grid.addComponentColumn(candidature -> {
-                Button accepterButton = new Button("Accepter", event -> traiterCandidature(con, candidature, "ACCEPTE"));
-                Button refuserButton = new Button("Refuser", event -> traiterCandidature(con, candidature, "REFUSE"));
+                Button accepterButton = new Button("Accepter", event -> {
+    try (Connection localCon = ConnectionPool.getConnection()) {
+        traiterCandidature(localCon, candidature, "ACCEPTE");
+    } catch (SQLException ex) {
+        Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
+        ex.printStackTrace();
+    }
+});
+
+Button refuserButton = new Button("Refuser", event -> {
+    try (Connection localCon = ConnectionPool.getConnection()) {
+        traiterCandidature(localCon, candidature, "REFUSE");
+    } catch (SQLException ex) {
+        Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
+        ex.printStackTrace();
+    }
+});
                 return new HorizontalLayout(accepterButton, refuserButton);
             }).setHeader("Actions");
 
@@ -150,14 +165,14 @@ public class AttributionSRI extends VerticalLayout {
     }
 
     private void traiterCandidature(Connection con, Candidature candidature, String statut) {
-        try {
-            // Mise à jour du statut dans la base de données
-            Candidature.mettreAJourStatut(con, candidature.getIne(), candidature.getOrdre(), statut);
-            Notification.show("La candidature pour l'établissement " + candidature.getIdOffreMobilité() + " a été " + statut.toLowerCase() + ".");
-            afficherProfilEtudiant(con); // Rafraîchir la liste après mise à jour
-        } catch (SQLException ex) {
-            Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
-            ex.printStackTrace();
-        }
+    try {
+        // Mise à jour du statut dans la base de données
+        Candidature.mettreAJourStatut(con, candidature.getIne(), candidature.getOrdre(), statut);
+        Notification.show("La candidature pour l'établissement " + candidature.getIdOffreMobilité() + " a été " + statut.toLowerCase() + ".");
+        afficherProfilEtudiant(con); // Rafraîchir la liste après mise à jour
+    } catch (SQLException ex) {
+        Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
+        ex.printStackTrace();
     }
+}
 }
