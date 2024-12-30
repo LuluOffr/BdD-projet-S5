@@ -64,101 +64,115 @@ public class CandidaturePanel extends VerticalLayout {
         // Champs pour entrer l'INE
         TextField ineField = new TextField("Entrez votre INE");
         Button validerINE = new Button("Valider", event -> {
-            String ine = ineField.getValue();
+    String ine = ineField.getValue();
 
-            // Vérifier si un INE est bien saisi
-            if (ine == null || ine.trim().isEmpty()) {
-                Notification.show("Veuillez entrer un INE valide.");
+    // Vérifier si un INE est bien saisi
+    if (ine == null || ine.trim().isEmpty()) {
+        Notification.show("Veuillez entrer un INE valide.");
+        return;
+    }
+
+    // Connexion pour chercher l'étudiant et vérifier ses candidatures
+    try (Connection con = ConnectionPool.getConnection()) {
+        Optional<Etudiant> etu = Etudiant.trouveEtudiant(con, ine);
+
+        if (etu.isPresent()) {
+            etudiant = etu.get();
+
+            // Vérifier si l'étudiant a déjà complété ses candidatures
+            if (Candidature.Candidaturesmax(con, ine)) {
+                Notification.show("Vous avez déjà complété vos 5 vœux. Vous ne pouvez pas candidater à nouveau.");
                 return;
             }
 
-            // Connexion pour chercher l'étudiant
-            try (Connection con = ConnectionPool.getConnection()) {
-                Optional<Etudiant> etu = Etudiant.trouveEtudiant(con, ine);
-
-                if (etu.isPresent()) {
-                    etudiant = etu.get();
-                    Notification.show("Bienvenue " + etudiant.getPrenom() + " " + etudiant.getNom());
-                    afficherFormulaire(); // Appelle une méthode pour afficher le formulaire des choix
-                } else {
-                    Notification.show("Aucun étudiant trouvé avec cet INE.");
-                }
-            } catch (SQLException e) {
-                Notification.show("Erreur lors de la recherche : " + e.getLocalizedMessage());
-                e.printStackTrace();
-            }
-        });
+            Notification.show("Bienvenue " + etudiant.getPrenom() + " " + etudiant.getNom());
+            afficherFormulaire(); // Appelle une méthode pour afficher le formulaire des choix
+        } else {
+            Notification.show("Aucun étudiant trouvé avec cet INE.");
+        }
+    } catch (SQLException e) {
+        Notification.show("Erreur lors de la recherche : " + e.getLocalizedMessage());
+        e.printStackTrace();
+    }
+});
 
         // Ajouter les champs et le bouton au panneau
         this.add(ineField, validerINE);
     }
 
     private void afficherFormulaire() {
-        try (Connection con = ConnectionPool.getConnection()) {
-            // Charger les offres disponibles
-            List<OffreMobilite> offres = OffreMobilite.toutesLesOffres(con);
+    try (Connection con = ConnectionPool.getConnection()) {
+        // Charger les offres disponibles
+        List<OffreMobilite> offres = OffreMobilite.toutesLesOffres(con);
 
-            if (offres.isEmpty()) {
-                Notification.show("Aucune offre de mobilité disponible !");
-                return;
-            }
+        if (offres.isEmpty()) {
+            Notification.show("Aucune offre de mobilité disponible !");
+            return;
+        }
 
-            choixPartenaires = new ArrayList<>();
-            for (int i = 1; i <= 5; i++) {
-                // Capturer l'index `i` dans une variable finale pour l'utiliser dans une lambda
-                final int ordre = i;
+        choixPartenaires = new ArrayList<>();
+        for (int i = 1; i <= 5; i++) {
+            // Capturer l'index `i` dans une variable finale pour l'utiliser dans une lambda
+            final int ordre = i;
 
-                ComboBox<OffreMobilite> comboBox = new ComboBox<>("Établissement choisi n°" + ordre);
-                comboBox.setItems(offres);
+            ComboBox<OffreMobilite> comboBox = new ComboBox<>("Établissement choisi n°" + ordre);
+            comboBox.setItems(offres);
 
-                // Générer les libellés des offres
-                comboBox.setItemLabelGenerator(offre -> {
-                    try (Connection localCon = ConnectionPool.getConnection()) {
-                        Partenaire partenaire = offre.getPartenaire(localCon)
-                                .orElseThrow(() -> new SQLException("Partenaire introuvable pour l'offre : " + offre.getId()));
-                        return partenaire.getRefPartenaire() + " (" + offre.getNbrPlaces() + " places )";
-                    } catch (SQLException ex) {
-                        Notification.show("Erreur lors de la récupération du partenaire : " + ex.getLocalizedMessage());
-                        return "Erreur : données non disponibles";
-                    }
-                });
+            // Générer les libellés des offres
+            comboBox.setItemLabelGenerator(offre -> {
+                try (Connection localCon = ConnectionPool.getConnection()) {
+                    Partenaire partenaire = offre.getPartenaire(localCon)
+                            .orElseThrow(() -> new SQLException("Partenaire introuvable pour l'offre : " + offre.getId()));
+                    return partenaire.getRefPartenaire() + " (" + offre.getNbrPlaces() + " places )";
+                } catch (SQLException ex) {
+                    Notification.show("Erreur lors de la récupération du partenaire : " + ex.getLocalizedMessage());
+                    return "Erreur : données non disponibles";
+                }
+            });
 
-                // Vérifier les doublons lors des sélections
-                comboBox.addValueChangeListener(event -> checkDuplicates());
+            // Ajouter un bouton pour valider ce choix individuellement
+            Button enregistrerBouton = new Button("Enregistrer ce choix");
 
-                // Ajouter un bouton pour valider ce choix individuellement
-                Button enregistrerBouton = new Button("Enregistrer ce choix", event -> {
-                    try (Connection localCon = ConnectionPool.getConnection()) {
-                        enregistrerCandidaturesIndividuellement(localCon, comboBox, ordre);
-                    } catch (SQLException ex) {
-                        Notification.show("Erreur lors de l'enregistrement : " + ex.getLocalizedMessage());
-                        ex.printStackTrace();
-                    }
-                });
+            // Ajouter le listener pour vérifier les doublons
+            comboBox.addValueChangeListener(event -> {
+                doubloncand();
+                enregistrerBouton.setEnabled(comboBox.getValue() != null); // Désactiver si aucune sélection
+            });
 
-                // Ajouter le comboBox et le bouton
-                choixPartenaires.add(comboBox);
-                this.add(comboBox, enregistrerBouton);
-            }
+            enregistrerBouton.addClickListener(event -> {
+                try (Connection localCon = ConnectionPool.getConnection()) {
+                    enregistrerCandidaturesIndividuellement(localCon, comboBox, ordre);
+                    enregistrerBouton.setEnabled(false); // Désactiver le bouton après validation
+                    Notification.show("Le choix a été validé et enregistré !");
+                } catch (SQLException ex) {
+                    Notification.show("Erreur lors de l'enregistrement : " + ex.getLocalizedMessage());
+                    ex.printStackTrace();
+                }
+            });
 
-        } catch (SQLException e) {
-            Notification.show("Erreur lors du chargement des offres : " + e.getLocalizedMessage());
-            e.printStackTrace();
+            // Ajouter le comboBox et le bouton
+            choixPartenaires.add(comboBox);
+            this.add(comboBox, enregistrerBouton);
+        }
+
+    } catch (SQLException e) {
+        Notification.show("Erreur lors du chargement des offres : " + e.getLocalizedMessage());
+        e.printStackTrace();
+    }
+}
+
+private void doubloncand() {
+    List<OffreMobilite> selections = new ArrayList<>();
+    for (ComboBox<OffreMobilite> comboBox : choixPartenaires) {
+        OffreMobilite selection = comboBox.getValue();
+        if (selection != null && selections.contains(selection)) {
+            Notification.show("Vous ne pouvez pas choisir deux fois le même établissement !");
+            comboBox.setValue(null); // Réinitialiser le champ en cas de doublon
+        } else if (selection != null) {
+            selections.add(selection);
         }
     }
-
-    private void checkDuplicates() {
-        List<OffreMobilite> selections = new ArrayList<>();
-        for (ComboBox<OffreMobilite> comboBox : choixPartenaires) {
-            OffreMobilite selection = comboBox.getValue();
-            if (selection != null && selections.contains(selection)) {
-                Notification.show("Vous ne pouvez pas choisir deux fois le même établissement !");
-                comboBox.setValue(null); // Réinitialiser le champ en cas de doublon
-            } else if (selection != null) {
-                selections.add(selection);
-            }
-        }
-    }
+}
 
     private void enregistrerCandidaturesIndividuellement(Connection con, ComboBox<OffreMobilite> comboBox, int ordre) {
         OffreMobilite selection = comboBox.getValue();

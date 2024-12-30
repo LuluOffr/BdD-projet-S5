@@ -165,6 +165,20 @@ public static List<Candidature> toutesLesCandidatures(Connection con) throws SQL
     }
 }
 
+public static boolean Candidaturesmax(Connection con, String ine) throws SQLException {
+    String query = "SELECT COUNT(*) AS total FROM candidature WHERE ine = ?";
+    try (PreparedStatement pst = con.prepareStatement(query)) {
+        pst.setString(1, ine);
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                int totalCandidatures = rs.getInt("total");
+                return totalCandidatures >= 5; // Retourne true si l'étudiant a 5 vœux ou plus
+            }
+        }
+    }
+    return false;
+}
+
     public static int creeConsole(Connection con) throws SQLException {
         String ine = ConsoleFdB.entreeString("INE : ");
         String idOffreMobilite = ConsoleFdB.entreeString("ID Offre Mobilité : ");
