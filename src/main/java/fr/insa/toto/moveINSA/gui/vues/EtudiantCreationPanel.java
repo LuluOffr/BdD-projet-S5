@@ -44,15 +44,15 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 /**
- * Vue pour créer un nouvel étudiant avec vérification par mot de passe.
+ * pour créer un nouvel etudiant
  */
 @PageTitle("Créer un Étudiant")
 @Route(value = "etudiants/nouveau", layout = MainLayout.class)
 public class EtudiantCreationPanel extends VerticalLayout {
 
-    private static final String PASSWORD = "SRI2024"; // Mot de passe requis
-    private boolean isAuthenticated = false; // Vérifie si l'utilisateur a entré le bon mot de passe
-    private VerticalLayout contentLayout; // Contient les champs et le bouton de sauvegarde
+    private static final String PASSWORD = "SRI2024"; 
+    private boolean isAuthenticated = false; 
+    private VerticalLayout contentLayout; 
 
     public EtudiantCreationPanel() {
         this.add(new H3("Création d'un nouveau profil étudiant"));
@@ -63,7 +63,7 @@ public class EtudiantCreationPanel extends VerticalLayout {
             if (PASSWORD.equals(passwordField.getValue())) {
                 isAuthenticated = true;
                 Notification.show("Accès autorisé !");
-                showCreationForm(); // Afficher le formulaire de création d'étudiant
+                showCreationForm(); 
             } else {
                 Notification.show("Mot de passe incorrect !", 3000, Notification.Position.MIDDLE);
             }
@@ -73,9 +73,9 @@ public class EtudiantCreationPanel extends VerticalLayout {
         this.add(new Paragraph("Veuillez entrer le mot de passe :"));
         this.add(passwordLayout);
 
-        // Conteneur pour les champs du formulaire
+
         contentLayout = new VerticalLayout();
-        this.add(contentLayout); // Ajout du conteneur (vide initialement)
+        this.add(contentLayout);
     }
 
     private void showCreationForm() {
@@ -96,14 +96,14 @@ public class EtudiantCreationPanel extends VerticalLayout {
                 String score = scoreField.getValue();
 
                 try (Connection con = ConnectionPool.getConnection()) {
-                    // Vérification des tables disponibles
+                    // verif table
                     ResultSet rs = con.getMetaData().getTables(null, null, "%", null);
                     System.out.println("Tables disponibles dans la base :");
                     while (rs.next()) {
                         System.out.println(rs.getString("TABLE_NAME"));
                     }
 
-                    // Création d'un nouvel étudiant et enregistrement en base
+                    // enregistrement bdd
                     Etudiant etudiant = new Etudiant(ine, nom, prenom, classe, score);
                     etudiant.saveInDB(con);
 
@@ -119,8 +119,8 @@ public class EtudiantCreationPanel extends VerticalLayout {
                 }
             });
 
-            // Ajouter les champs et le bouton au conteneur
-            contentLayout.removeAll(); // Nettoyer le conteneur avant d'ajouter les champs
+
+            contentLayout.removeAll();
             contentLayout.add(
                     new Paragraph("Remplissez les informations pour créer un étudiant :"),
                     ineField, nomField, prenomField, classeField, scoreField, saveButton

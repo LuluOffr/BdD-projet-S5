@@ -48,7 +48,7 @@ public class NouvelleOffrePanel extends VerticalLayout {
         this.passwordField = new PasswordField("Mot de passe de l'établissement");
         this.ifPlaces = new IntegerField("Nombre de places");
         this.ifPlaces.setEnabled(false); // Désactivé par défaut
-        this.bSave = new Button("Save");
+        this.bSave = new Button("Sauvegarder");
 
         // Listener pour vérifier le mot de passe avant d'activer le champ de places
         this.cbPartenaire.addValueChangeListener(event -> {
@@ -93,7 +93,7 @@ public class NouvelleOffrePanel extends VerticalLayout {
                         nouvelle.saveInDB(con);
                         Notification.show("Nouvelle offre enregistrée");
                     } catch (SQLException ex) {
-                        Notification.show("Problème interne : " + ex.getLocalizedMessage());
+                        Notification.show("Problème" + ex.getLocalizedMessage());
                     }
                 }
             }

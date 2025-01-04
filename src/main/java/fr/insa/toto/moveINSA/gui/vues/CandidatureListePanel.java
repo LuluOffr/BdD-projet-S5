@@ -46,21 +46,20 @@ import java.util.List;
 @Route(value = "candidatures/liste", layout = MainLayout.class)
 public class CandidatureListePanel extends VerticalLayout {
 
-    private static final String PASSWORD = "SRI2024"; // Mot de passe requis pour afficher la liste
-    private boolean isAuthenticated = false; // Vérifie si l'utilisateur a entré le bon mot de passe
-    private Grid<Candidature> grid; // Grid pour afficher les candidatures
-    private VerticalLayout contentLayout; // Contenu principal
+    private static final String PASSWORD = "SRI2024"; 
+    private boolean isAuthenticated = false; 
+    private Grid<Candidature> grid;
+    private VerticalLayout contentLayout; 
 
     public CandidatureListePanel() {
         this.add(new H3("Liste des candidatures"));
 
-        // Ajout du champ pour entrer le mot de passe
         PasswordField passwordField = new PasswordField("Mot de passe");
         Button verifyButton = new Button("Vérifier", event -> {
             if (PASSWORD.equals(passwordField.getValue())) {
                 isAuthenticated = true;
                 Notification.show("Accès autorisé !");
-                showCandidatureList(); // Afficher la liste des candidatures
+                ListeCand();
             } else {
                 Notification.show("Mot de passe incorrect !", 3000, Notification.Position.MIDDLE);
             }
@@ -69,17 +68,16 @@ public class CandidatureListePanel extends VerticalLayout {
         HorizontalLayout passwordLayout = new HorizontalLayout(passwordField, verifyButton);
         this.add(passwordLayout);
 
-        // Conteneur pour la liste des candidatures (sera rempli après l'authentification)
         contentLayout = new VerticalLayout();
         this.add(contentLayout);
     }
 
-    private void showCandidatureList() {
+    private void ListeCand() {
     if (isAuthenticated) {
         try (Connection con = ConnectionPool.getConnection()) {
             List<Candidature> candidatures = Candidature.toutesLesCandidatures(con);
 
-            // Vérifiez les candidatures récupérées
+
             candidatures.forEach(candidature -> 
                 System.out.println("Candidature: INE=" + candidature.getIne() +
                         ", idOffreMobilité=" + candidature.getIdOffreMobilité() +
@@ -89,11 +87,11 @@ public class CandidatureListePanel extends VerticalLayout {
             );
 
             grid = new Grid<>(Candidature.class, false);
-            grid.addColumn(Candidature::getIne).setHeader("INE");
-            grid.addColumn(Candidature::getIdOffreMobilité).setHeader("ID Offre Mobilité");
-            grid.addColumn(Candidature::getDate).setHeader("Date");
-            grid.addColumn(Candidature::getOrdre).setHeader("Ordre");
-            grid.addColumn(Candidature::getStatut).setHeader("Statut");
+            grid.addColumn(Candidature::getIne).setHeader("INE").setSortable(true);
+            grid.addColumn(Candidature::getIdOffreMobilité).setHeader("ID Offre Mobilité").setSortable(true);
+            grid.addColumn(Candidature::getDate).setHeader("Date").setSortable(true);
+            grid.addColumn(Candidature::getOrdre).setHeader("Ordre").setSortable(true);
+            grid.addColumn(Candidature::getStatut).setHeader("Statut").setSortable(true);
 
             grid.setItems(candidatures);
             contentLayout.removeAll();

@@ -45,21 +45,20 @@ import java.util.List;
 @Route(value = "etudiants/liste", layout = MainLayout.class)
 public class EtudiantsListePanel extends VerticalLayout {
 
-    private static final String PASSWORD = "SRI2024"; // Mot de passe requis pour afficher la liste
-    private boolean isAuthenticated = false; // Vérifie si l'utilisateur a entré le bon mot de passe
-    private Grid<Etudiant> grid; // Grid pour afficher les étudiants
-    private VerticalLayout contentLayout; // Contenu principal
+    private static final String PASSWORD = "SRI2024"; 
+    private boolean isAuthenticated = false; 
+    private Grid<Etudiant> grid; 
+    private VerticalLayout contentLayout; 
 
     public EtudiantsListePanel() {
         this.add(new H3("Liste des étudiants"));
 
-        // Ajout du champ pour entrer le mot de passe
         PasswordField passwordField = new PasswordField("Mot de passe");
         Button verifyButton = new Button("Vérifier", event -> {
             if (PASSWORD.equals(passwordField.getValue())) {
                 isAuthenticated = true;
                 Notification.show("Accès autorisé !");
-                showStudentList(); // Afficher la liste des étudiants
+                Etudiantliste(); 
             } else {
                 Notification.show("Mot de passe incorrect !", 3000, Notification.Position.MIDDLE);
             }
@@ -68,15 +67,15 @@ public class EtudiantsListePanel extends VerticalLayout {
         HorizontalLayout passwordLayout = new HorizontalLayout(passwordField, verifyButton);
         this.add(passwordLayout);
 
-        // Conteneur pour la liste des étudiants (sera rempli après l'authentification)
+
         contentLayout = new VerticalLayout();
         this.add(contentLayout);
     }
 
-    private void showStudentList() {
+    private void Etudiantliste() {
         if (isAuthenticated) {
             try (Connection con = ConnectionPool.getConnection()) {
-                // Vérification des tables disponibles
+
                 ResultSet rs = con.getMetaData().getTables(null, null, "%", null);
                 System.out.println("Tables disponibles dans la base :");
                 while (rs.next()) {
@@ -90,11 +89,11 @@ public class EtudiantsListePanel extends VerticalLayout {
                 grid = new Grid<>(Etudiant.class, false);
 
                 // Ajouter des colonnes spécifiques
-                grid.addColumn(Etudiant::getIne).setHeader("INE");
-                grid.addColumn(Etudiant::getNom).setHeader("Nom");
-                grid.addColumn(Etudiant::getPrenom).setHeader("Prénom");
-                grid.addColumn(Etudiant::getClasse).setHeader("Classe");
-                grid.addColumn(Etudiant::getScore).setHeader("Score");
+                grid.addColumn(Etudiant::getIne).setHeader("INE").setSortable(true);
+                grid.addColumn(Etudiant::getNom).setHeader("Nom").setSortable(true);
+                grid.addColumn(Etudiant::getPrenom).setHeader("Prénom").setSortable(true);
+                grid.addColumn(Etudiant::getClasse).setHeader("Classe").setSortable(true);
+                grid.addColumn(Etudiant::getScore).setHeader("Score").setSortable(true);
 
                 // Ajouter les données au grid
                 grid.setItems(etudiants);

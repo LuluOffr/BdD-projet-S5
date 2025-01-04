@@ -33,7 +33,7 @@ import java.util.List;
 public class PartenaireGrid extends Grid<Partenaire> {
 
     public PartenaireGrid(List<Partenaire> partenaires) {
-        this.setColumnReorderingAllowed(true);
+        this.setColumnReorderingAllowed(false);
         this.addColumn(Partenaire::getRefPartenaire)
                 .setHeader("Partenaire")
                 .setSortable(true)
