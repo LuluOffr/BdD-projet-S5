@@ -37,53 +37,53 @@ public class PartenaireForm extends FormLayout {
     private TextField tfNom = new TextField("Nom de l'établissement");
     private TextField tfVille = new TextField("Ville");
 
-    private PasswordField initialPasswordField = new PasswordField("Mot de passe");
+    private PasswordField mdp = new PasswordField("Mot de passe");
     private Label generatedPasswordLabel = new Label();
 
-    private Button validateButton = new Button("Valider le mot de passe");
+    private Button valid = new Button("Valider le mot de passe");
 
     public PartenaireForm(Partenaire model, boolean modifiable) {
         this.model = model;
         this.setEnabled(modifiable);
 
         // désactive tout jusqu'a mdp
-        disableAllFields();
+        desactiv();
 
-        this.add(this.initialPasswordField, this.validateButton);
+        this.add(this.mdp, this.valid);
 
-        this.validateButton.addClickListener(event -> {
-            String enteredPassword = this.initialPasswordField.getValue();
+        this.valid.addClickListener(event -> {
+            String enteredPassword = this.mdp.getValue();
             if ("partenaire2024".equals(enteredPassword)) {
                 Notification.show("Mot de passe validé !");
-                enableAllFields();
+                activ();
             } else {
                 Notification.show("Mot de passe incorrect !", 3000, Notification.Position.MIDDLE);
             }
         });
 
-        // Ajout des champs
-        this.tfRefPartenaire.addValueChangeListener(event -> updateGeneratedPassword());
+        // Ajout 
+        this.tfRefPartenaire.addValueChangeListener(event -> mdpgenere());
         this.add(this.tfRefPartenaire, this.tfPays, this.tfNom, this.tfVille, this.generatedPasswordLabel);
 
-        // Mettre à jour la vue
-        this.updateView();
+        //met à jour la vue
+        this.majvue();
     }
 
-    private void disableAllFields() {
+    private void desactiv() {
         this.tfRefPartenaire.setEnabled(false);
         this.tfPays.setEnabled(false);
         this.tfNom.setEnabled(false);
         this.tfVille.setEnabled(false);
     }
 
-    private void enableAllFields() {
+    private void activ() {
         this.tfRefPartenaire.setEnabled(true);
         this.tfPays.setEnabled(true);
         this.tfNom.setEnabled(true);
         this.tfVille.setEnabled(true);
     }
 
-    private void updateGeneratedPassword() {
+    private void mdpgenere() {
         String enteredRef = this.tfRefPartenaire.getValue();
         if (!enteredRef.isEmpty()) {
             String generatedPassword = enteredRef + "2024";
@@ -93,14 +93,14 @@ public class PartenaireForm extends FormLayout {
         }
     }
 
-    public void updateModel() {
+    public void maj() {
         this.model.setRefPartenaire(this.tfRefPartenaire.getValue());
         this.model.setPays(this.tfPays.getValue());
         this.model.setNom(this.tfNom.getValue());
         this.model.setVille(this.tfVille.getValue());
     }
 
-    public void updateView() {
+    public void majvue() {
         this.tfRefPartenaire.setValue(this.model.getRefPartenaire());
         this.tfPays.setValue(this.model.getPays());
         this.tfNom.setValue(this.model.getNom());

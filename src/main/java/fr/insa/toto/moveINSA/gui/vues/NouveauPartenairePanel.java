@@ -50,7 +50,7 @@ public class NouveauPartenairePanel extends VerticalLayout{
         this.fPartenaire = new PartenaireForm(this.nouveau, true);
         this.Sauv = new Button("Sauvegarder", (t) -> {
             try (Connection con = ConnectionPool.getConnection()) {
-                this.fPartenaire.updateModel();
+                this.fPartenaire.maj();
                  this.nouveau.saveInDB(con);
             } catch (SQLException ex) {
                 System.out.println("Probleme : " + ex.getLocalizedMessage());
