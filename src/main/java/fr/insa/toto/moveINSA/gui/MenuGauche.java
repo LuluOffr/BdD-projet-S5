@@ -80,8 +80,8 @@ public class MenuGauche extends SideNav {
 
             // Menu étudiants
         SideNavItem etudiants = new SideNavItem("étudiants");
-        etudiants.addItem(new SideNavItem("liste (SRI)", "etudiants/liste/"+ className)); 
-        etudiants.addItem(new SideNavItem("nouveau (SRI)", "etudiants/nouveau/"+ className));
+        etudiants.addItem(new SideNavItem("liste (SRI)", EtudiantsListePanel.class)); 
+        etudiants.addItem(new SideNavItem("nouveau (SRI)", EtudiantCreationPanel.class));
         classItem.addItem(etudiants);
             // Ajouter ce sous-menu à l'onglet "Classes"
             classes.addItem(classItem);
@@ -103,8 +103,8 @@ public class MenuGauche extends SideNav {
 
             // Menu étudiants
         SideNavItem etudiants = new SideNavItem("étudiants");
-        etudiants.addItem(new SideNavItem("liste (SRI)", "etudiants/liste/"+ className)); 
-        etudiants.addItem(new SideNavItem("nouveau (SRI)", "etudiants/nouveau/"+ className));
+        etudiants.addItem(new SideNavItem("liste (SRI)", EtudiantsListePanel.class)); 
+        etudiants.addItem(new SideNavItem("nouveau (SRI)", EtudiantCreationPanel.class));
         classItem.addItem(etudiants);
             // Ajouter ce sous-menu à l'onglet "Classes"
             classes.addItem(classItem);
@@ -127,8 +127,8 @@ public class MenuGauche extends SideNav {
 
             // Menu étudiants
         SideNavItem etudiants = new SideNavItem("étudiants");
-        etudiants.addItem(new SideNavItem("liste (SRI)", "etudiants/liste/"+ className)); 
-        etudiants.addItem(new SideNavItem("nouveau (SRI)", "etudiants/nouveau/"+ className));
+        etudiants.addItem(new SideNavItem("liste (SRI)", EtudiantsListePanel.class)); 
+        etudiants.addItem(new SideNavItem("nouveau (SRI)", EtudiantCreationPanel.class));
         classItem.addItem(etudiants);
             // Ajouter ce sous-menu à l'onglet "Classes"
             classes.addItem(classItem);

@@ -25,37 +25,35 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.server.StreamResource;
 
 /**
- * Classe affichant le bandeau en haut de l'application MoveINSA.
+ * 
  */
 public class EnteteInitiale extends HorizontalLayout {
 
     public EnteteInitiale() {
-        // Définir la couleur de fond du bandeau
-        this.getStyle().set("background-color", "#d50000"); // Rouge thème INSA
-        this.getStyle().set("color", "white"); // Texte blanc
+        //banderole
+        this.getStyle().set("background-color", "#d50000"); 
+        this.getStyle().set("color", "white"); 
         this.getStyle().set("padding", "10px");
         this.getStyle().set("width", "100%");
         this.setAlignItems(FlexComponent.Alignment.CENTER);
 
-        // Partie gauche : Texte "MoveINSA"
+        //texte gauche
         Span titre = new Span("MoveINSA");
         titre.getStyle().set("font-size", "24px");
         titre.getStyle().set("font-weight", "bold");
         titre.getStyle().set("margin-left", "20px");
 
-        // Partie droite : Logo INSA Strasbourg
+        // Image insa stras
         StreamResource logoResource = new StreamResource("insa-logo.jpg",
-                () -> getClass().getResourceAsStream("/images/insa-logo.jpg")); // Chemin du logo
+                () -> getClass().getResourceAsStream("/images/insa-logo.jpg")); 
         Image logo = new Image(logoResource, "INSA Strasbourg");
         logo.setWidth("100px");
         logo.setHeight("auto");
         logo.getStyle().set("margin-right", "20px");
 
-        // Ajouter les composants
         this.add(titre);
         this.add(logo);
 
-        // Espacement entre les deux parties
         this.expand(titre);
     }
 }
