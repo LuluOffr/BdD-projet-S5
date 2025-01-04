@@ -137,7 +137,7 @@ public int saveInDB(Connection con) throws SQLException {
         insert.executeUpdate();
         try (ResultSet rid = insert.getGeneratedKeys()) {
             if (rid.next()) {
-                this.id = rid.getInt(1); // Récupère l'ID généré
+                this.id = rid.getInt(1); // recup id généré
             }
         }
         return this.getId();
@@ -214,14 +214,14 @@ public static int creeConsole(Connection con) throws SQLException {
     }
 
     /**
-     * @return the refPartenaire
+     * @return refPartenaire
      */
     public String getRefPartenaire() {
         return refPartenaire;
     }
 
     /**
-     * @param refPartenaire the refPartenaire to set
+     * @param refPartenaire 
      */
     public void setRefPartenaire(String refPartenaire) {
         this.refPartenaire = refPartenaire;
@@ -251,9 +251,6 @@ public void setVille(String Ville) {
     this.Ville = Ville;
 }
     
-    /**
-     * @return the id
-     */
     public int getId() {
         return id;
     }
