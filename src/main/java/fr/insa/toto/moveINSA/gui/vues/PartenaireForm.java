@@ -37,22 +37,20 @@ public class PartenaireForm extends FormLayout {
     private TextField tfNom = new TextField("Nom de l'établissement");
     private TextField tfVille = new TextField("Ville");
 
-    private PasswordField initialPasswordField = new PasswordField("Mot de passe initial");
+    private PasswordField initialPasswordField = new PasswordField("Mot de passe");
     private Label generatedPasswordLabel = new Label();
 
-    private Button validateButton = new Button("Valider le mot de passe initial");
+    private Button validateButton = new Button("Valider le mot de passe");
 
     public PartenaireForm(Partenaire model, boolean modifiable) {
         this.model = model;
         this.setEnabled(modifiable);
 
-        // Désactiver les champs jusqu'à validation du mot de passe initial
+        // désactive tout jusqu'a mdp
         disableAllFields();
 
-        // Ajout du champ de mot de passe initial et bouton de validation
         this.add(this.initialPasswordField, this.validateButton);
 
-        // Action pour valider le mot de passe initial
         this.validateButton.addClickListener(event -> {
             String enteredPassword = this.initialPasswordField.getValue();
             if ("partenaire2024".equals(enteredPassword)) {

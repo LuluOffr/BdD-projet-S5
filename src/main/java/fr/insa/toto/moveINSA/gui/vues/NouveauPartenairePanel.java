@@ -42,13 +42,13 @@ public class NouveauPartenairePanel extends VerticalLayout{
     private Partenaire nouveau;
     
     private PartenaireForm fPartenaire;
-    private Button bSave;
+    private Button Sauv;
     
     public NouveauPartenairePanel() {
         this.add(new H3("Creation d'un nouveau partenaire"));
         this.nouveau = new Partenaire("", "", "", "");
         this.fPartenaire = new PartenaireForm(this.nouveau, true);
-        this.bSave = new Button("Sauvegarder", (t) -> {
+        this.Sauv = new Button("Sauvegarder", (t) -> {
             try (Connection con = ConnectionPool.getConnection()) {
                 this.fPartenaire.updateModel();
                  this.nouveau.saveInDB(con);
@@ -57,7 +57,7 @@ public class NouveauPartenairePanel extends VerticalLayout{
                 Notification.show("Probleme : " + ex.getLocalizedMessage());
             }
         });
-        this.add(this.fPartenaire,this.bSave);
+        this.add(this.fPartenaire,this.Sauv);
     }
     
 }
