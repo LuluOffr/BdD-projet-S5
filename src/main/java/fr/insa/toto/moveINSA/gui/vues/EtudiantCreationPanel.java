@@ -57,13 +57,12 @@ public class EtudiantCreationPanel extends VerticalLayout {
     public EtudiantCreationPanel() {
         this.add(new H3("Création d'un nouveau profil étudiant"));
 
-        // Section pour la vérification par mot de passe
         PasswordField passwordField = new PasswordField("Mot de passe");
         Button verifyButton = new Button("Vérifier", event -> {
             if (PASSWORD.equals(passwordField.getValue())) {
                 isAuthenticated = true;
                 Notification.show("Accès autorisé !");
-                showCreationForm(); 
+                Creat(); 
             } else {
                 Notification.show("Mot de passe incorrect !", 3000, Notification.Position.MIDDLE);
             }
@@ -78,16 +77,15 @@ public class EtudiantCreationPanel extends VerticalLayout {
         this.add(contentLayout);
     }
 
-    private void showCreationForm() {
+    private void Creat() {
         if (isAuthenticated) {
-            // Champs de formulaire
             TextField ineField = new TextField("INE");
             TextField nomField = new TextField("Nom");
             TextField prenomField = new TextField("Prénom");
             TextField classeField = new TextField("Classe");
             TextField scoreField = new TextField("Score");
 
-            // Bouton de sauvegarde
+            //boutons
             Button saveButton = new Button("Sauvegarder", event -> {
                 String ine = ineField.getValue();
                 String nom = nomField.getValue();

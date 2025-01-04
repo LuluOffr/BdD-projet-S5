@@ -37,7 +37,7 @@ import java.util.List;
 
 /**
  * @author lucas
- * Classe permettant à un étudiant de voir les résultats de ses candidatures.
+ * pour voir les resulats de ses candidaturs
  */
 
 
@@ -45,18 +45,15 @@ import java.util.List;
 @Route(value = "attributions/etudiant", layout = MainLayout.class)
 public class AttributionEtudiant extends VerticalLayout {
 
-    private TextField ineField; // Champ pour entrer l'INE
-    private Button validerButton; // Bouton pour valider l'INE
-    private Grid<Candidature> grid; // Tableau pour afficher les candidatures
-
+    private TextField ineField; 
+    private Button validerButton; 
+    private Grid<Candidature> grid; 
     public AttributionEtudiant() {
         // Titre de la page
         this.add(new H3("Résultat de vos candidatures"));
 
-        // Champ pour entrer l'INE
         ineField = new TextField("Entrez votre INE");
 
-        // Bouton pour valider
         validerButton = new Button("Valider", event -> afficherCandidatures());
 
         // Ajout des composants
@@ -84,18 +81,16 @@ public class AttributionEtudiant extends VerticalLayout {
             return;
         }
 
-        // Chargement des candidatures depuis la base de données
         try (Connection con = ConnectionPool.getConnection()) {
             List<Candidature> candidatures = Candidature.trouverCandidaturesParEtudiant(con, ine);
 
-            // Si aucune candidature n'est trouvée
+            // si pas de cand trouvée
             if (candidatures.isEmpty()) {
                 Notification.show("Aucune candidature trouvée pour cet INE.");
-                grid.setItems(); // Vider le tableau
+                grid.setItems(); 
                 return;
             }
 
-            // Affichage des candidatures dans le tableau
             grid.setItems(candidatures);
         } catch (SQLException ex) {
             Notification.show("Erreur lors du chargement des candidatures : " + ex.getLocalizedMessage());

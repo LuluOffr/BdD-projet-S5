@@ -82,10 +82,10 @@ public class EtudiantsListePanel extends VerticalLayout {
                     System.out.println(rs.getString("TABLE_NAME"));
                 }
 
-                // Récupérer la liste des étudiants depuis la base de données
+                // recup liste etudiant de la bdd
                 List<Etudiant> etudiants = Etudiant.tousLesEtudiants(con);
 
-                // Créer un grid pour afficher les étudiants
+                // grid pour afficher les étudiants
                 grid = new Grid<>(Etudiant.class, false);
 
                 // Ajouter des colonnes spécifiques
@@ -95,10 +95,10 @@ public class EtudiantsListePanel extends VerticalLayout {
                 grid.addColumn(Etudiant::getClasse).setHeader("Classe").setSortable(true);
                 grid.addColumn(Etudiant::getScore).setHeader("Score").setSortable(true);
 
-                // Ajouter les données au grid
+                // ajout  données au grid
                 grid.setItems(etudiants);
 
-                // Ajouter le grid au panneau principal
+                // ajout grid au panneau principal
                 contentLayout.removeAll(); // Nettoyer le contenu précédent
                 contentLayout.add(new Paragraph("Liste des étudiants :"));
                 contentLayout.add(grid);

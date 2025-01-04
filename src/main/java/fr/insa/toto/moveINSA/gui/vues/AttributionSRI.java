@@ -49,15 +49,14 @@ import java.util.Optional;
 @Route(value = "attributions/sri", layout = MainLayout.class)
 public class AttributionSRI extends VerticalLayout {
 
-    private static final String PASSWORD = "SRI2024"; // Mot de passe requis
-    private boolean isAuthenticated = false; // Indique si l'utilisateur a été authentifié
-    private Etudiant etudiant; // Étudiant sélectionné
-    private VerticalLayout contentLayout; // Conteneur pour les informations
+    private static final String PASSWORD = "SRI2024"; 
+    private boolean isAuthenticated = false; 
+    private Etudiant etudiant; 
+    private VerticalLayout contentLayout; 
 
     public AttributionSRI() {
         this.add(new H3("Espace d'attribution des candidatures (SRI)"));
 
-        // Champ pour entrer le mot de passe
         PasswordField passwordField = new PasswordField("Mot de passe");
         Button validatePasswordButton = new Button("Valider", event -> {
             if (PASSWORD.equals(passwordField.getValue())) {
@@ -72,7 +71,6 @@ public class AttributionSRI extends VerticalLayout {
         HorizontalLayout passwordLayout = new HorizontalLayout(passwordField, validatePasswordButton);
         this.add(passwordLayout);
 
-        // Conteneur pour afficher les informations une fois authentifié
         contentLayout = new VerticalLayout();
         this.add(contentLayout);
     }
@@ -82,7 +80,7 @@ public class AttributionSRI extends VerticalLayout {
 
         contentLayout.removeAll();
 
-        // Formulaire de recherche pour trouver un étudiant par son INE
+        //recherche étudiant par l'ine
         TextField ineField = new TextField("Entrez l'INE de l'étudiant");
         Button rechercherButton = new Button("Rechercher", event -> {
             String ine = ineField.getValue();
@@ -113,14 +111,14 @@ public class AttributionSRI extends VerticalLayout {
     private void afficherProfilEtudiant(Connection con) {
         contentLayout.removeAll();
 
-        // Affichage des informations de l'étudiant
+        //affiche infos de l'etudiant
         contentLayout.add(new H3("Profil de l'étudiant :"));
         contentLayout.add(new Paragraph("Nom : " + etudiant.getNom()));
         contentLayout.add(new Paragraph("Prénom : " + etudiant.getPrenom()));
         contentLayout.add(new Paragraph("Classe : " + etudiant.getClasse()));
 
         try {
-            // Récupération des candidatures de l'étudiant
+            //recup les candidatures de l'étudiant
             List<Candidature> candidatures = Candidature.trouverCandidaturesParEtudiant(con, etudiant.getIne());
             if (candidatures.isEmpty()) {
                 contentLayout.add(new Paragraph("Aucune candidature trouvée pour cet étudiant."));
@@ -129,7 +127,7 @@ public class AttributionSRI extends VerticalLayout {
 
             contentLayout.add(new H3("Candidatures de l'étudiant :"));
 
-            // Création d'une grille pour afficher les candidatures
+            //grille
             Grid<Candidature> grid = new Grid<>(Candidature.class, false);
 
             grid.addColumn(Candidature::getIdOffreMobilité).setHeader("Établissement demandé");
@@ -137,7 +135,7 @@ public class AttributionSRI extends VerticalLayout {
             grid.addColumn(Candidature::getDate).setHeader("Date");
             grid.addColumn(Candidature::getStatut).setHeader("Statut");
 
-            // Ajouter des boutons "Accepter" et "Refuser" pour chaque candidature
+            // "accepter'' et "refuser" pour chaque boutton
             grid.addComponentColumn(candidature -> {
                 Button accepterButton = new Button("Accepter", event -> {
     try (Connection localCon = ConnectionPool.getConnection()) {
@@ -169,10 +167,10 @@ Button refuserButton = new Button("Refuser", event -> {
 
     private void traiterCandidature(Connection con, Candidature candidature, String statut) {
     try {
-        // Mise à jour du statut dans la base de données
+        //maj du statut dans la base de données
         Candidature.mettreAJourStatut(con, candidature.getIne(), candidature.getOrdre(), statut);
         Notification.show("La candidature pour l'établissement " + candidature.getIdOffreMobilité() + " a été " + statut.toLowerCase() + ".");
-        afficherProfilEtudiant(con); // Rafraîchir la liste après mise à jour
+        afficherProfilEtudiant(con); 
     } catch (SQLException ex) {
         Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
         ex.printStackTrace();

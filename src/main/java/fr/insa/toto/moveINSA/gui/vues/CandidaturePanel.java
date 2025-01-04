@@ -61,32 +61,31 @@ public class CandidaturePanel extends VerticalLayout {
         this.add(new H3("Création d'une candidature"));
         this.add(new H3("Choississez entre 3,4 ou 5 vœux"));
 
-        // Champs pour entrer l'INE
         TextField ineField = new TextField("Entrez votre INE");
         Button validerINE = new Button("Valider", event -> {
     String ine = ineField.getValue();
 
-    // Vérifier si un INE est bien saisi
+    // verif si ine est bien saisi
     if (ine == null || ine.trim().isEmpty()) {
         Notification.show("Veuillez entrer un INE valide.");
         return;
     }
 
-    // Connexion pour chercher l'étudiant et vérifier ses candidatures
+    // connexion pour chercher étudiant et verif ses candidatures
     try (Connection con = ConnectionPool.getConnection()) {
         Optional<Etudiant> etu = Etudiant.trouveEtudiant(con, ine);
 
         if (etu.isPresent()) {
             etudiant = etu.get();
 
-            // Vérifier si l'étudiant a déjà complété ses candidatures
+            // verif si l'étudiant a déjà complété ses candidatures
             if (Candidature.Candidaturesmax(con, ine)) {
                 Notification.show("Vous avez déjà complété vos 5 vœux. Vous ne pouvez pas candidater à nouveau.");
                 return;
             }
 
             Notification.show("Bienvenue " + etudiant.getPrenom() + " " + etudiant.getNom());
-            afficherFormulaire(); // Appelle une méthode pour afficher le formulaire des choix
+            afficherFormulaire(); 
         } else {
             Notification.show("Aucun étudiant trouvé avec cet INE.");
         }
@@ -102,7 +101,7 @@ public class CandidaturePanel extends VerticalLayout {
 
     private void afficherFormulaire() {
     try (Connection con = ConnectionPool.getConnection()) {
-        // Charger les offres disponibles
+        //charge les offres disponibles
         List<OffreMobilite> offres = OffreMobilite.toutesLesOffres(con);
 
         if (offres.isEmpty()) {
@@ -130,13 +129,13 @@ public class CandidaturePanel extends VerticalLayout {
                 }
             });
 
-            // Ajouter un bouton pour valider ce choix individuellement
+            // bouton pour choix (individuel)
             Button enregistrerBouton = new Button("Enregistrer ce choix");
 
-            // Ajouter le listener pour vérifier les doublons
+            // verif doublon
             comboBox.addValueChangeListener(event -> {
                 doubloncand();
-                enregistrerBouton.setEnabled(comboBox.getValue() != null); // Désactiver si aucune sélection
+                enregistrerBouton.setEnabled(comboBox.getValue() != null); 
             });
 
             enregistrerBouton.addClickListener(event -> {
@@ -167,7 +166,7 @@ private void doubloncand() {
         OffreMobilite selection = comboBox.getValue();
         if (selection != null && selections.contains(selection)) {
             Notification.show("Vous ne pouvez pas choisir deux fois le même établissement !");
-            comboBox.setValue(null); // Réinitialiser le champ en cas de doublon
+            comboBox.setValue(null); 
         } else if (selection != null) {
             selections.add(selection);
         }
@@ -178,24 +177,24 @@ private void doubloncand() {
         OffreMobilite selection = comboBox.getValue();
         if (selection != null) {
             try {
-                // Vérification et récupération du partenaire associé
+                // verif et recup du partenaire associeee
                 Partenaire partenaire = selection.getPartenaire(con)
                         .orElseThrow(() -> new SQLException("Partenaire introuvable pour l'offre sélectionnée"));
                 String refPartenaire = partenaire.getRefPartenaire();
 
-                // Création de la candidature
+                //creer cand
                 Candidature candidature = new Candidature(
                         etudiant.getIne(),
-                        refPartenaire, // Associer le refPartenaire comme idOffreMobilité
+                        refPartenaire, // !!! associe le partenaire comme idOffreMobilité
                         Date.valueOf(LocalDate.now()),
                         ordre,
                         "attente"
                 );
 
-                // Sauvegarde dans la base de données
+                //sauv bdd
                 candidature.saveInDB(con);
 
-                // Confirmation de l'enregistrement
+                //confirme enregistrement
                 Notification.show("Candidature enregistrée avec succès pour " + refPartenaire, 3000, Notification.Position.BOTTOM_START);
             } catch (SQLException ex) {
                 Notification.show("Erreur lors de l'enregistrement : " + ex.getLocalizedMessage());
