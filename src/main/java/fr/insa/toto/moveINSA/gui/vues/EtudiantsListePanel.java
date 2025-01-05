@@ -114,11 +114,11 @@ public class EtudiantsListePanel extends VerticalLayout implements BeforeEnterOb
 
             grid = new Grid<>(Etudiant.class, false);
 
-            grid.addColumn(Etudiant::getIne).setHeader("INE");
-            grid.addColumn(Etudiant::getNom).setHeader("Nom");
-            grid.addColumn(Etudiant::getPrenom).setHeader("Prénom");
-            grid.addColumn(Etudiant::getClasse).setHeader("Classe");
-            grid.addColumn(Etudiant::getScore).setHeader("Score");
+            grid.addColumn(Etudiant::getIne).setHeader("INE").setSortable(true);
+            grid.addColumn(Etudiant::getNom).setHeader("Nom").setSortable(true);
+            grid.addColumn(Etudiant::getPrenom).setHeader("Prénom").setSortable(true);
+            grid.addColumn(Etudiant::getClasse).setHeader("Classe").setSortable(true);
+            grid.addColumn(Etudiant::getScore).setHeader("Score").setSortable(true);
 
             grid.setItems(etudiants);
 
