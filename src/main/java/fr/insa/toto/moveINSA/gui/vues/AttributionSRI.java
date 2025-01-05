@@ -42,7 +42,7 @@ import java.util.Optional;
 /**
  * 
  * @author lucas
- * Classe pour gérer les candidatures des étudiants par le SRI.
+ * classe qui gère où le SRI pourra gérer les candidatures des étudiants
  * 
  */
 @PageTitle("Attribution des candidatures (SRI)")

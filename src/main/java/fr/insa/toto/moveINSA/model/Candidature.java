@@ -76,9 +76,8 @@ public class Candidature implements Serializable {
                 '}';
     }
 
-    /**
-     * Enregistre une candidature dans la base de données.
-     */
+    //enregistre une candidature dans la BdD
+    
     public int saveInDB(Connection con) throws SQLException {
         try (PreparedStatement insert = con.prepareStatement(
                 "INSERT INTO candidature (ine, idOffreMobilité, Date, ordre, statut) VALUES (?, ?, ?, ?, ?)",
@@ -117,9 +116,7 @@ public class Candidature implements Serializable {
     }
 }
 
-    /**
-     * Trouve une candidature par INE.
-     */
+    //trouve la candidature avec l'ine
     public static Optional<Candidature> trouveCandidature(Connection con, String ine) throws SQLException {
         try (PreparedStatement pst = con.prepareStatement(
                 "SELECT ine, idOffreMobilité, Date, ordre, statut FROM candidature WHERE ine = ?")) {
@@ -140,9 +137,7 @@ public class Candidature implements Serializable {
         }
     }
 
-    /**
-     * Récupère toutes les candidatures pour un étudiant.
-     */
+    //recup toutes les candidatures d'un étudiant
     public static List<Candidature> trouverCandidaturesParEtudiant(Connection con, String ine) throws SQLException {
         String query = "SELECT ine, idOffreMobilité, Date, ordre, statut FROM candidature WHERE ine = ?";
         try (PreparedStatement pst = con.prepareStatement(query)) {
@@ -162,9 +157,8 @@ public class Candidature implements Serializable {
         }
     }
 
-    /**
-     * Vérifie si un étudiant a atteint le maximum de candidatures.
-     */
+    
+     // vérifie si un étudiant a atteint le maximum de candidatures
     public static boolean Candidaturesmax(Connection con, String ine) throws SQLException {
         String query = "SELECT COUNT(*) AS total FROM candidature WHERE ine = ?";
         try (PreparedStatement pst = con.prepareStatement(query)) {
@@ -179,9 +173,9 @@ public class Candidature implements Serializable {
         return false;
     }
 
-    /**
-     * Met à jour le statut d'une candidature.
-     */
+   
+     //maj le statut d'une candidature
+     
     public static void mettreAJourStatut(Connection con, String ine, int ordre, String statut) throws SQLException {
         try (PreparedStatement pst = con.prepareStatement(
                 "UPDATE candidature SET statut = ? WHERE ine = ? AND ordre = ?")) {
@@ -192,9 +186,7 @@ public class Candidature implements Serializable {
         }
     }
 
-    /**
-     * Méthode console pour créer une candidature.
-     */
+    //console: méthode pour creer cand
     public static int creeConsole(Connection con) throws SQLException {
         String ine = ConsoleFdB.entreeString("INE : ");
         String idOffreMobilite = ConsoleFdB.entreeString("ID Offre Mobilité : ");
@@ -205,15 +197,13 @@ public class Candidature implements Serializable {
         return nouvelle.saveInDB(con);
     }
 
-    /**
-     * Méthode console pour sélectionner une candidature.
-     */
+    //console: méthode pour selectionner candidatures
     public static Candidature selectInConsole(Connection con) throws SQLException {
         return ListUtils.selectOne("Choisissez une candidature :",
                 toutesLesCandidatures(con), (elem) -> elem.getIne());
     }
 
-    // Getters et setters
+    // getters et setters
     public int getId() {
         return id;
     }

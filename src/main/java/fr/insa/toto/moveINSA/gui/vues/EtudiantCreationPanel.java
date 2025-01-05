@@ -45,28 +45,27 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-/**
- * Vue pour créer un nouvel étudiant avec vérification par mot de passe.
- */
+//classe qui permet au SRI de créer le profil de l'étudiant qui peut faire sa mobilité
+
 @PageTitle("Créer un Étudiant")
 @Route(value = "etudiants/nouveau/:classeSelectionnee", layout = MainLayout.class)
 public class EtudiantCreationPanel extends VerticalLayout implements BeforeEnterObserver{
 
     private static String classeSelectionnee;
-    private static final String PASSWORD = "SRI2024"; // Mot de passe requis
-    private boolean isAuthenticated = false; // Vérifie si l'utilisateur a entré le bon mot de passe
-    private VerticalLayout contentLayout; // Contient les champs et le bouton de sauvegarde
+    private static final String PASSWORD = "SRI2024"; 
+    private boolean isAuthenticated = false; 
+    private VerticalLayout contentLayout; 
 
     public EtudiantCreationPanel() {
         this.add(new H3("Création d'un nouveau profil étudiant"));
 
-        // Section pour la vérification par mot de passe
+
         PasswordField passwordField = new PasswordField("Mot de passe");
         Button verifyButton = new Button("Vérifier", event -> {
             if (PASSWORD.equals(passwordField.getValue())) {
                 isAuthenticated = true;
                 Notification.show("Accès autorisé !");
-                showCreationForm(classeSelectionnee); // Afficher le formulaire de création d'étudiant
+                showCreationForm(classeSelectionnee); //affiche formulaire étudiants
             } else {
                 Notification.show("Mot de passe incorrect !", 3000, Notification.Position.MIDDLE);
             }
@@ -76,50 +75,46 @@ public class EtudiantCreationPanel extends VerticalLayout implements BeforeEnter
         this.add(new Paragraph("Veuillez entrer le mot de passe :"));
         this.add(passwordLayout);
 
-        // Conteneur pour les champs du formulaire
         contentLayout = new VerticalLayout();
-        this.add(contentLayout); // Ajout du conteneur (vide initialement)
+        this.add(contentLayout); //
     }
  @Override
     public void beforeEnter(BeforeEnterEvent event) {
         // Extraire le paramètre 'className' de l'URL
         this.classeSelectionnee = event.getRouteParameters().get("classeSelectionnee").orElse("Aucune classe");
-        // Afficher les étudiants pour la classe sélectionnée
+        // affiche étudiants pour la classe sélectionnée
         showCreationForm(classeSelectionnee);
     }
     private void showCreationForm(String classeSelectionnee) {
     if (isAuthenticated) {
-        // Champs de formulaire
         TextField ineField = new TextField("INE");
         TextField nomField = new TextField("Nom");
         TextField prenomField = new TextField("Prénom");
 //        TextField classeField = new TextField("Classe");
         TextField scoreField = new TextField("Score");
             
-        // Bouton de sauvegarde
         Button saveButton = new Button("Sauvegarder", event -> {
             String ine = ineField.getValue();
             String nom = nomField.getValue();
             String prenom = prenomField.getValue();
             String classe = classeSelectionnee;
             String score = scoreField.getValue();
- // Création de l'objet Etudiant
+            
                 Etudiant nouvelEtudiant = new Etudiant(ine, nom, prenom, classe, score);
-                // Enregistrer dans une base de données ou une liste
+
                 try (Connection con = ConnectionPool.getConnection()) {
-                    nouvelEtudiant.saveInDB(con); // Appel à une méthode pour sauvegarder
+                    nouvelEtudiant.saveInDB(con); // sauv
                 } catch (SQLException e) {
             Notification.show("Erreur lors de l'enregistrement dans la base : " + e.getMessage());
             e.printStackTrace();
         }
 
             try (Connection con = ConnectionPool.getConnection()) {
-                // Vérification que la table existe pour la classe spécifiée
-                String tableName = classe; // Exemple : "GC2", "TP3"
+                String tableName = classe; 
                 ResultSet rs = con.getMetaData().getTables(null, null, tableName, null);
 
                 if (!rs.next()) {
-                    // Si la table n'existe pas, la créer
+                    // si table n'existe pas
                     String createTableSQL = "CREATE TABLE " + tableName + " (" +
                             "INE VARCHAR(50) PRIMARY KEY, " +
                             "Nom VARCHAR(100), " +
@@ -131,7 +126,7 @@ public class EtudiantCreationPanel extends VerticalLayout implements BeforeEnter
                     System.out.println("Table créée : " + tableName);
                 }
 
-                // Insérer l'étudiant dans la table correspondante
+                // insére l'étudiant dans la table correspondante
                 String insertSQL = "INSERT INTO " + tableName + " (INE, Nom, Prenom, Classe, Score) VALUES (?, ?, ?, ?, ?)";
                 try (var pstmt = con.prepareStatement(insertSQL)) {
                     pstmt.setString(1, ine);
@@ -154,7 +149,6 @@ public class EtudiantCreationPanel extends VerticalLayout implements BeforeEnter
             }
         });
 
-        // Ajouter le formulaire au contenu principal
         VerticalLayout formLayout = new VerticalLayout(ineField, nomField, prenomField,  scoreField, saveButton);
         formLayout.setSpacing(true);
         formLayout.setPadding(true);
@@ -164,7 +158,6 @@ public class EtudiantCreationPanel extends VerticalLayout implements BeforeEnter
 
 
 
-            // Ajouter les champs et le bouton au conteneur
             contentLayout.removeAll(); // Nettoyer le conteneur avant d'ajouter les champs
             contentLayout.add(
                     new Paragraph("Remplissez les informations pour créer un étudiant :"),

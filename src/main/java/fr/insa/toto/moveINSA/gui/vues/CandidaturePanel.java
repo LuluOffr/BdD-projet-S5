@@ -149,7 +149,6 @@ public class CandidaturePanel extends VerticalLayout {
                 }
             });
 
-            // Ajouter le comboBox et le bouton
             choixPartenaires.add(comboBox);
             this.add(comboBox, enregistrerBouton);
         }

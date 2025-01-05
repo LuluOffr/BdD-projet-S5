@@ -49,33 +49,28 @@ public class AttributionEtudiant extends VerticalLayout {
     private Button validerButton; 
     private Grid<Candidature> grid; 
     public AttributionEtudiant() {
-        // Titre de la page
         this.add(new H3("Résultat de vos candidatures"));
 
         ineField = new TextField("Entrez votre INE");
 
         validerButton = new Button("Valider", event -> afficherCandidatures());
 
-        // Ajout des composants
         this.add(ineField, validerButton);
 
-        // Configuration du tableau
         grid = new Grid<>(Candidature.class, false);
         grid.addColumn(Candidature::getOrdre).setHeader("Ordre");
         grid.addColumn(Candidature::getIdOffreMobilité).setHeader("Partenaire");
         grid.addColumn(Candidature::getStatut).setHeader("Statut");
 
-        // Ajout du tableau à la vue
         this.add(grid);
     }
 
-    /**
-     * Affiche les candidatures de l'étudiant après validation de son INE.
-     */
+//affiche les candidatures de l'étudiant apres validation de l'ine
+    
     private void afficherCandidatures() {
         String ine = ineField.getValue().trim();
 
-        // Vérification que l'INE est renseigné
+        // verif ine
         if (ine.isEmpty()) {
             Notification.show("Veuillez entrer un INE valide.");
             return;

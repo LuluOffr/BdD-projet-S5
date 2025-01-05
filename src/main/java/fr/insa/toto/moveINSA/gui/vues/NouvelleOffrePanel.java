@@ -47,7 +47,7 @@ public class NouvelleOffrePanel extends VerticalLayout {
         this.cbPartenaire = new ChoixPartenaireCombo();
         this.passwordField = new PasswordField("Mot de passe de l'établissement");
         this.ifPlaces = new IntegerField("Nombre de places");
-        this.ifPlaces.setEnabled(false); // dasac par défaut
+        this.ifPlaces.setEnabled(false); // desac par défaut
         this.bSave = new Button("Sauvegarder");
 
         // vérifi mdp avant d'afficher la suite
