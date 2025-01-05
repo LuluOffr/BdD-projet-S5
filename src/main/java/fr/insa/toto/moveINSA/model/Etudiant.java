@@ -81,6 +81,24 @@ public static List<Etudiant> tousLesEtudiants(Connection con) throws SQLExceptio
         return etudiants;
     }
 }
+public static List<Etudiant> tousLesEtudiantsParClasse(Connection con, String classe) throws SQLException {
+    List<Etudiant> etudiants = new ArrayList<>();
+    String query = "SELECT * FROM " + classe;
+    try (PreparedStatement stmt = con.prepareStatement(query);
+         ResultSet rs = stmt.executeQuery()) {
+
+        while (rs.next()) {
+            etudiants.add(new Etudiant(
+                rs.getString("INE"),
+                rs.getString("Nom"),
+                rs.getString("Prenom"),
+                rs.getString("Classe"),
+                rs.getString("Score")
+            ));
+        }
+    }
+    return etudiants;
+}
 //trouve l'etudiant avec l'ine
 public static Optional<Etudiant> trouveEtudiant(Connection con, String ine) throws SQLException {
     String query = "SELECT ine, nom, Prénom AS prenom, Classe AS classe, Score AS score FROM etudiant WHERE ine = ?";
