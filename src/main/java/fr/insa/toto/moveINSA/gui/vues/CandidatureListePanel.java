@@ -31,25 +31,27 @@ import com.vaadin.flow.router.Route;
 import fr.insa.beuvron.vaadin.utils.ConnectionPool;
 import fr.insa.toto.moveINSA.gui.MainLayout;
 import fr.insa.toto.moveINSA.model.Candidature;
+import fr.insa.toto.moveINSA.model.Etudiant;
 
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.ArrayList;
+import java.util.Optional;
+
 /**
  *
  * @author lucas
  */
 
-
 @PageTitle("Liste des candidatures")
-
 @Route(value = "candidatures/liste", layout = MainLayout.class)
 public class CandidatureListePanel extends VerticalLayout {
 
     private static final String PASSWORD = "SRI2024"; 
     private boolean isAuthenticated = false; 
-    private Grid<Candidature> grid;
-    private VerticalLayout contentLayout; 
+    private Grid<CandidatureAvecEtudiant> grid;
+    private VerticalLayout contentLayout;
 
     public CandidatureListePanel() {
         this.add(new H3("Liste des candidatures"));
@@ -72,36 +74,96 @@ public class CandidatureListePanel extends VerticalLayout {
         this.add(contentLayout);
     }
 
+    //pour afficher candidatures avec infos de l'étudiant
     private void ListeCand() {
-    if (isAuthenticated) {
-        try (Connection con = ConnectionPool.getConnection()) {
-            List<Candidature> candidatures = Candidature.toutesLesCandidatures(con);
+        if (isAuthenticated) {
+            try (Connection con = ConnectionPool.getConnection()) {
+                List<Candidature> candidatures = Candidature.toutesLesCandidatures(con);
 
+                // Enrichir les candidatures avec les informations des étudiants
+                List<CandidatureAvecEtudiant> candidaturesAvecEtudiant = new ArrayList<>();
+                for (Candidature candidature : candidatures) {
+                    Optional<Etudiant> etudiantOpt = Etudiant.trouveEtudiant(con, candidature.getIne());
+                    if (etudiantOpt.isPresent()) {
+                        Etudiant etudiant = etudiantOpt.get();
+                        candidaturesAvecEtudiant.add(new CandidatureAvecEtudiant(
+                                candidature,
+                                etudiant.getNom(),
+                                etudiant.getPrenom(),
+                                etudiant.getClasse()
+                        ));
+                    }
+                }
 
-            candidatures.forEach(candidature -> 
-                System.out.println("Candidature: INE=" + candidature.getIne() +
-                        ", idOffreMobilité=" + candidature.getIdOffreMobilité() +
-                        ", Date=" + candidature.getDate() +
-                        ", Ordre=" + candidature.getOrdre()+
-                        ", statut=" + candidature.getStatut())
-            );
+                grid = new Grid<>(CandidatureAvecEtudiant.class, false);
 
-            grid = new Grid<>(Candidature.class, false);
-            grid.addColumn(Candidature::getIne).setHeader("INE").setSortable(true);
-            grid.addColumn(Candidature::getIdOffreMobilité).setHeader("ID Offre Mobilité").setSortable(true);
-            grid.addColumn(Candidature::getDate).setHeader("Date").setSortable(true);
-            grid.addColumn(Candidature::getOrdre).setHeader("Ordre").setSortable(true);
-            grid.addColumn(Candidature::getStatut).setHeader("Statut").setSortable(true);
+                grid.addColumn(CandidatureAvecEtudiant::getIne).setHeader("INE").setSortable(true);
+                grid.addColumn(CandidatureAvecEtudiant::getNom).setHeader("Nom").setSortable(true);
+                grid.addColumn(CandidatureAvecEtudiant::getPrenom).setHeader("Prénom").setSortable(true);
+                grid.addColumn(CandidatureAvecEtudiant::getClasse).setHeader("Classe").setSortable(true);
+                grid.addColumn(CandidatureAvecEtudiant::getIdOffreMobilite).setHeader("ID Offre Mobilité").setSortable(true);
+                grid.addColumn(CandidatureAvecEtudiant::getDate).setHeader("Date").setSortable(true);
+                grid.addColumn(CandidatureAvecEtudiant::getOrdre).setHeader("Ordre").setSortable(true);
+                grid.addColumn(CandidatureAvecEtudiant::getStatut).setHeader("Statut").setSortable(true);
 
-            grid.setItems(candidatures);
-            contentLayout.removeAll();
-            contentLayout.add(new Paragraph("Liste des candidatures :"));
-            contentLayout.add(grid);
+                grid.setItems(candidaturesAvecEtudiant);
 
-        } catch (SQLException ex) {
-            Notification.show("Erreur : Impossible de charger les candidatures. Détails : " + ex.getLocalizedMessage());
-            ex.printStackTrace();
+                // enlever ancien contenu et ajouter le tableau
+                contentLayout.removeAll();
+                contentLayout.add(new Paragraph("Liste des candidatures :"));
+                contentLayout.add(grid);
+
+            } catch (SQLException ex) {
+                Notification.show("Erreur : Impossible de charger les candidatures. Détails : " + ex.getLocalizedMessage());
+                ex.printStackTrace();
+            }
         }
     }
-}
+
+    //classe interne pour avoir des infos de l'étudiant en plus dans la tableau
+    public static class CandidatureAvecEtudiant {
+        private final Candidature candidature;
+        private final String nom;
+        private final String prenom;
+        private final String classe;
+
+        public CandidatureAvecEtudiant(Candidature candidature, String nom, String prenom, String classe) {
+            this.candidature = candidature;
+            this.nom = nom;
+            this.prenom = prenom;
+            this.classe = classe;
+        }
+
+        public String getIne() {
+            return candidature.getIne();
+        }
+
+        public String getIdOffreMobilite() {
+            return candidature.getIdOffreMobilité();
+        }
+
+        public java.sql.Date getDate() {
+            return candidature.getDate();
+        }
+
+        public int getOrdre() {
+            return candidature.getOrdre();
+        }
+
+        public String getStatut() {
+            return candidature.getStatut();
+        }
+
+        public String getNom() {
+            return nom;
+        }
+
+        public String getPrenom() {
+            return prenom;
+        }
+
+        public String getClasse() {
+            return classe;
+        }
+    }
 }
