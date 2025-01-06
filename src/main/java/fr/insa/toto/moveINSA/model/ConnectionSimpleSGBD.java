@@ -97,7 +97,7 @@ public class ConnectionSimpleSGBD {
     	return connectMySQL("92.222.25.165", 3306,
             	"m3_loffredo01",
             	"m3_loffredo01",
-            	"f0408491");  //  
+            	"f0408491");
 	}
 
 	/**
@@ -201,4 +201,6 @@ public class ConnectionSimpleSGBD {
 	}
 
 }
+
+
 
