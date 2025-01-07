@@ -41,6 +41,12 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ *
+ * @author lucas
+ */
+
+
 @PageTitle("Attribution des candidatures (SRI)")
 @Route(value = "attributions/sri", layout = MainLayout.class)
 public class AttributionSRI extends VerticalLayout {
@@ -130,31 +136,30 @@ public class AttributionSRI extends VerticalLayout {
         // Ajouter une colonne pour afficher les places disponibles
         grid.addColumn(candidature -> {
             try (Connection localCon = ConnectionPool.getConnection()) {
-                return getPlacesDisponibles(localCon, candidature.getIdOffreMobilité());
-            } catch (SQLException e) {
-                e.printStackTrace();
-                return "Erreur";
-            }
+            return getPlacesDisponibles(localCon, candidature.getIdOffreMobilité(), candidature.getIdOffreMobilité());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        return "Erreur";
+        }
         }).setHeader("Places Disponibles");
 
-        // Ajouter les boutons Accepter et Refuser
         grid.addComponentColumn(candidature -> {
             Button accepterButton = new Button("Accepter");
             Button refuserButton = new Button("Refuser");
 
-            // Gestion de l'action "Accepter"
+            // gestion accepter
             accepterButton.addClickListener(event -> {
                 try (Connection localCon = ConnectionPool.getConnection()) {
                     traiterCandidature(localCon, candidature, "ACCEPTE");
-                    accepterButton.setEnabled(false); // Désactiver le bouton après clic
-                    refuserButton.setEnabled(false);  // Désactiver également le bouton Refuser
+                    accepterButton.setEnabled(false); 
+                    refuserButton.setEnabled(false);  //desas bouton apres clic
                 } catch (SQLException ex) {
                     Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
                     ex.printStackTrace();
                 }
             });
 
-            // Gestion de l'action "Refuser"
+            // gestion refuser
             refuserButton.addClickListener(event -> {
                 try (Connection localCon = ConnectionPool.getConnection()) {
                     traiterCandidature(localCon, candidature, "REFUSE");
@@ -234,16 +239,17 @@ public class AttributionSRI extends VerticalLayout {
         }
     }
 
-    private String getPlacesDisponibles(Connection con, String refPartenaire) {
+    private String getPlacesDisponibles(Connection con, String refPartenaire, String idOffreMobilite) {
     String query = """
-        SELECT SUM(offremobilite.nbrplaces) AS placesDisponibles
+        SELECT offremobilite.nbrplaces AS placesDisponibles
         FROM offremobilite
         JOIN partenaire ON offremobilite.proposepar = partenaire.id
-        WHERE partenaire.refPartenaire = ?
+        WHERE partenaire.refPartenaire = ? AND offremobilite.id = ?
     """;
 
     try (PreparedStatement pst = con.prepareStatement(query)) {
         pst.setString(1, refPartenaire); // Récupère les places disponibles pour le partenaire
+        pst.setString(2, idOffreMobilite); // Filtre par l'offre spécifique
         try (ResultSet rs = pst.executeQuery()) {
             if (rs.next()) {
                 int places = rs.getInt("placesDisponibles");
