@@ -18,7 +18,7 @@ public class Etudiant implements Serializable {
     private static final long serialVersionUID = 1L;
 
     // Attributs
-    private int id;
+
     private String ine;
     private String nom;
     private String prenom;
@@ -26,12 +26,9 @@ public class Etudiant implements Serializable {
     private String score;
 
     // Constructeurs
-    public Etudiant(String ine, String nom, String prenom, String classe, String score) {
-        this(-1, ine, nom, prenom, classe, score);
-    }
 
-    public Etudiant(int id, String ine, String nom, String prenom, String classe, String score) {
-        this.id = id;
+    public Etudiant(String ine, String nom, String prenom, String classe, String score) {
+ 
         this.ine = ine;
         this.nom = nom;
         this.prenom = prenom;
@@ -40,28 +37,38 @@ public class Etudiant implements Serializable {
     }
 
     // Méthodes CRUD
+public String saveInDB(Connection con) throws SQLException {
+    // Requête d'insertion
+    String query = "INSERT INTO etudiant (ine, nom, prénom, classe, score) VALUES (?, ?, ?, ?, ?)";
 
-    public int saveInDB(Connection con) throws SQLException {
-        if (this.id != -1) {
-            throw new IllegalStateException("Étudiant déjà sauvegardé.");
+    try (PreparedStatement insert = con.prepareStatement(query)) {
+        // Remplir les paramètres de la requête
+        insert.setString(1, this.ine);    // INE
+        insert.setString(2, this.nom);   // Nom
+        insert.setString(3, this.prenom); // Prénom
+        insert.setString(4, this.classe); // Classe
+        insert.setString(5, this.score);    // Score
+
+        // Exécuter la requête d'insertion
+        int rowsAffected = insert.executeUpdate();
+
+        if (rowsAffected > 0) {
+            System.out.println("Étudiant ajouté avec succès : " + this.ine);
+            return this.ine;
+        } else {
+            throw new SQLException("Impossible d'ajouter l'étudiant. Aucune ligne affectée.");
         }
-        String query = "INSERT INTO etudiant (ine, nom, Prénom, Classe, Score) VALUES (?, ?, ?, ?, ?)";
-        try (PreparedStatement insert = con.prepareStatement(query, PreparedStatement.RETURN_GENERATED_KEYS)) {
-            insert.setString(1, this.ine);
-            insert.setString(2, this.nom);
-            insert.setString(3, this.prenom);
-            insert.setString(4, this.classe);
-            insert.setString(5, this.score);
-            insert.executeUpdate();
-
-            try (ResultSet rs = insert.getGeneratedKeys()) {
-                if (rs.next()) {
-                    this.id = rs.getInt(1);
-                }
-            }
-            return this.id;
+    } catch (SQLException e) {
+        // Gérer le cas où l'INE n'est pas unique
+        if (e.getSQLState().equals("23505")) { // Code SQL pour violation de contrainte d'unicité (peut varier selon la BDD)
+            throw new SQLException("Un étudiant avec cet INE existe déjà : " + this.ine, e);
+        } else {
+            throw e; // Propager d'autres erreurs SQL
         }
     }
+}
+
+
 
 public static List<Etudiant> tousLesEtudiants(Connection con) throws SQLException {
     String query = "SELECT ine, nom, Prénom AS prenom, Classe AS classe, Score AS score FROM etudiant";
@@ -70,7 +77,6 @@ public static List<Etudiant> tousLesEtudiants(Connection con) throws SQLExceptio
         List<Etudiant> etudiants = new ArrayList<>();
         while (rs.next()) {
             etudiants.add(new Etudiant(
-                    -1, 
                     rs.getString("ine"),
                     rs.getString("nom"),
                     rs.getString("prenom"),
@@ -107,7 +113,6 @@ public static Optional<Etudiant> trouveEtudiant(Connection con, String ine) thro
         try (ResultSet rs = pst.executeQuery()) {
             if (rs.next()) {
                 return Optional.of(new Etudiant(
-                        -1, //pas d'id
                         rs.getString("ine"),
                         rs.getString("nom"),
                         rs.getString("prenom"),
@@ -121,7 +126,7 @@ public static Optional<Etudiant> trouveEtudiant(Connection con, String ine) thro
 }
 
 
-public static int creeConsole(Connection con) throws SQLException {
+public static String creeConsole(Connection con) throws SQLException {
     String ine = ConsoleFdB.entreeString("INE : ");
     String nom = ConsoleFdB.entreeString("Nom : ");
     String prenom = ConsoleFdB.entreeString("Prénom : ");
@@ -137,9 +142,7 @@ public static int creeConsole(Connection con) throws SQLException {
     }
 
     // Méthodes Getters et Setters
-    public int getId() {
-        return id;
-    }
+   
 
     public String getIne() {
         return ine;
@@ -184,7 +187,6 @@ public static int creeConsole(Connection con) throws SQLException {
     @Override
     public String toString() {
         return "Etudiant{" +
-                "id=" + id +
                 ", ine='" + ine + '\'' +
                 ", nom='" + nom + '\'' +
                 ", prenom='" + prenom + '\'' +

@@ -103,14 +103,9 @@ public class EtudiantCreationPanel extends VerticalLayout implements BeforeEnter
                 Etudiant nouvelEtudiant = new Etudiant(ine, nom, prenom, classe, score);
 
                 try (Connection con = ConnectionPool.getConnection()) {
-                    nouvelEtudiant.saveInDB(con); // sauv
-                } catch (SQLException e) {
-            Notification.show("Erreur lors de l'enregistrement dans la base : " + e.getMessage());
-            e.printStackTrace();
-        }
-
-            try (Connection con = ConnectionPool.getConnection()) {
-                String tableName = classe; 
+                    nouvelEtudiant.saveInDB(con); // sauv etudiant bdd
+                    
+                    String tableName = classe; 
                 ResultSet rs = con.getMetaData().getTables(null, null, tableName, null);
 
                 if (!rs.next()) {
@@ -120,7 +115,7 @@ public class EtudiantCreationPanel extends VerticalLayout implements BeforeEnter
                             "Nom VARCHAR(100), " +
                             "Prenom VARCHAR(100), " +
                             "Classe VARCHAR(50), " +
-                            "Score INT(50)" +
+                            "Score VARCHAR(50)" +
                             ")";
                     con.createStatement().executeUpdate(createTableSQL);
                     System.out.println("Table créée : " + tableName);
@@ -143,17 +138,18 @@ public class EtudiantCreationPanel extends VerticalLayout implements BeforeEnter
                 prenomField.clear();
 //                classeField.clear();
                 scoreField.clear();
-            } catch (SQLException ex) {
-                System.out.println("Erreur lors de la sauvegarde : " + ex.getLocalizedMessage());
-                Notification.show("Erreur lors de la sauvegarde : " + ex.getLocalizedMessage());
-            }
+                } catch (SQLException e) {
+            Notification.show("Erreur lors de l'enregistrement dans la base : " + e.getMessage());
+            e.printStackTrace();
+        }
+
+
         });
 
         VerticalLayout formLayout = new VerticalLayout(ineField, nomField, prenomField,  scoreField, saveButton);
         formLayout.setSpacing(true);
         formLayout.setPadding(true);
         formLayout.setWidthFull();
-        //getUI().ifPresent(ui -> ui.setContent(formLayout));
     
 
 
