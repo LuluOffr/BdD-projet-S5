@@ -116,7 +116,7 @@ public class Candidature implements Serializable {
     }
 }
 
-    //trouve la candidature avec l'ine
+    //trouve la candidature avec l'ine (utilisé par la console)
     public static Optional<Candidature> trouveCandidature(Connection con, String ine) throws SQLException {
         try (PreparedStatement pst = con.prepareStatement(
                 "SELECT ine, idOffreMobilité, Date, ordre, statut FROM candidature WHERE ine = ?")) {
@@ -137,7 +137,7 @@ public class Candidature implements Serializable {
         }
     }
 
-    //recup toutes les candidatures d'un étudiant
+    //recup toutes les candidatures d'un étudiant (utilisé par le gui)
     public static List<Candidature> trouverCandidaturesParEtudiant(Connection con, String ine) throws SQLException {
         String query = "SELECT ine, idOffreMobilité, Date, ordre, statut FROM candidature WHERE ine = ?";
         try (PreparedStatement pst = con.prepareStatement(query)) {
