@@ -209,4 +209,3 @@ this.add(imageCarousel);
         return image;
     }
 }
-

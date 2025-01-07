@@ -42,6 +42,9 @@ public class OffreMobilite {
     private int id;
     private int nbrPlaces;
     private int proposePar;
+    private String semestre;
+    private String nomDispositif;
+    private String specialite;
 
     /**
      * création d'une nouvelle Offre en mémoire, non existant dans la Base de
@@ -50,7 +53,7 @@ public class OffreMobilite {
      * @param proposePar
      */
     public OffreMobilite(int nbrPlaces, int proposePar) {
-        this(-1, nbrPlaces, proposePar);
+        this(-1, nbrPlaces, proposePar, null, null, null);
     }
 
     /**
@@ -58,16 +61,23 @@ public class OffreMobilite {
      * @param nbrPlaces
      * @param id
      * @param proposePar
+     * @param semestre
+     * @param nomDispositif
+     * @param specialite
      */
-    public OffreMobilite(int id, int nbrPlaces, int proposePar) {
+    public OffreMobilite(int id, int nbrPlaces, int proposePar, String semestre, String nomDispositif, String specialite) {
         this.id = id;
         this.nbrPlaces = nbrPlaces;
         this.proposePar = proposePar;
+        this.semestre = semestre;
+        this.nomDispositif = nomDispositif;
+        this.specialite = specialite;
     }
 
     @Override
     public String toString() {
-        return "OffreMobilite{" + "id=" + this.getId() + " ; nbrPlaces=" + nbrPlaces + " ; proposePar=" + proposePar + '}';
+        return "OffreMobilite{" + "id=" + this.getId() + " ; nbrPlaces=" + nbrPlaces + " ; proposePar=" + proposePar +
+               " ; semestre=" + semestre + " ; nomDispositif=" + nomDispositif + " ; specialite=" + specialite + '}';
     }
 
     /**
@@ -87,10 +97,13 @@ public class OffreMobilite {
             throw new fr.insa.toto.moveINSA.model.EntiteDejaSauvegardee();
         }
         try (PreparedStatement insert = con.prepareStatement(
-                "insert into offremobilite (nbrplaces,proposepar) values (?,?)",
+                "insert into offremobilite (nbrplaces,proposepar,semestre,nomdispositif,specialite) values (?,?,?,?,?)",
                 PreparedStatement.RETURN_GENERATED_KEYS)) {
             insert.setInt(1, this.nbrPlaces);
             insert.setInt(2, this.proposePar);
+            insert.setString(3, this.semestre);
+            insert.setString(4, this.nomDispositif);
+            insert.setString(5, this.specialite);
             insert.executeUpdate();
             try (ResultSet rid = insert.getGeneratedKeys()) {
                 rid.next();
@@ -102,11 +115,11 @@ public class OffreMobilite {
 
     public static List<OffreMobilite> toutesLesOffres(Connection con) throws SQLException {
         try (PreparedStatement pst = con.prepareStatement(
-                "select id,nbrplaces,proposepar from offremobilite")) {
+                "select id,nbrplaces,proposepar,semestre,nomdispositif,specialite from offremobilite")) {
             ResultSet rs = pst.executeQuery();
             List<OffreMobilite> res = new ArrayList<>();
             while (rs.next()) {
-                res.add(new OffreMobilite(rs.getInt(1), rs.getInt(2), rs.getInt(3)));
+                res.add(new OffreMobilite(rs.getInt(1), rs.getInt(2), rs.getInt(3), rs.getString(4), rs.getString(5), rs.getString(6)));
             }
             return res;
         }
@@ -164,7 +177,18 @@ public Optional<Partenaire> getPartenaire(Connection con) throws SQLException {
         return proposePar;
     }
 
-    
+    public String getSemestre() {
+        return semestre;
+    }
 
+    public String getNomDispositif() {
+        return nomDispositif;
+    }
+
+    public String getSpecialite() {
+        return specialite;
+    }
 
 }
+
+

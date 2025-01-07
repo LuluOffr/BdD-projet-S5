@@ -67,71 +67,42 @@ public class OffresPanel extends VerticalLayout {
         try (Connection con = ConnectionPool.getConnection()) {
             this.add(new H2("Liste des offres proposées"));
             PreparedStatement offresAvecPart = con.prepareStatement(
-                    "select offremobilite.id as idOffre,partenaire.refPartenaire,offremobilite.nbrplaces,partenaire.id as idPartenaire \n"
+                    "select offremobilite.id as idOffre,partenaire.refPartenaire,offremobilite.nbrplaces,offremobilite.semestre,offremobilite.nomdispositif,partenaire.id as idPartenaire \n"
                     + "  from offremobilite \n"
                     + "    join partenaire on offremobilite.proposepar = partenaire.id");
-            //this.add(new H3("Liste des toutes les offres que proposent nos partenaires "));
-            //this.add(new ResultSetGrid(offresAvecPart));
             
             this.gOffres = new ResultSetGrid(offresAvecPart, new GridDescription(List.of(
-                    //new ColumnDescription().colData(0).visible(false), // on veut pouvoir accéder à l'id de l'offre mais non l'afficher
                     new ColumnDescription().colData(1).headerString("Partenaire"),
                     new ColumnDescription().colData(2).headerString("Nombre de places"),
-                    // pour montrer l'utilisation d'un composant dans une colonne
                     new ColumnDescription().colDataCompo(2, (t) -> new IntAsIcon((Integer) t)).headerString("Places"),
-                    // pour montrer une colonne calculée à partir de plusieurs colonnes de données
-                    // rappelez vous que le paramètre t de la lambda ci-dessous est de type List<Object>
-                    // on peut donc accéder à la valeur des colonnes simplement par un get
-                    // comme ici, on concatene, la méthode toString définie pour tout objet sera
-                    // appelée, et on n'a donc pas besoin de faire des "cast" en fonction du type réel des colonnes
-                    //new ColumnDescription().colCalculatedObject((t) -> t.get(1) + "/" + t.get(3) + " : " + t.get(2)).headerString("resumé"),
                     new ColumnDescription().colData(3).visible(false) // même chose pour l'id du partenaire
             )));
 
             this.add(new H3("Liste des toutes les offres que proposent nos partenaires "));
             this.add(new Paragraph("Pour plus de détails, veuillez directement consulter le site web de l'université partenaire"));
             this.add(this.gOffres);
-            /*
-            this.bPostule = new Button("Postuler");
-            this.bPostule.addClickListener((t) -> {
-                // comme la grille est générique, chaque ligne contient une List<Object> : un Object par colonne
-                // par défaut une grille est en mono-selection
-                // mais comme on peut fixer en multi-selection, on a potentiellement un ensemble d'item selectionnés
-                Set<List<Object>> lignesSelected = this.gOffres.getSelectedItems();
-                // dans notre cas 0 ou 1 item selectionné
-                if (lignesSelected.isEmpty()) {
-                    Notification.show("selectionnez une offre");
-                } else {
-                    List<Object> ligne = lignesSelected.iterator().next();
-                    // normalement, on ne montre pas les ID à l'utilisateur
-                    // ici c'est pour montrer que l'on a bien accès à la colonne 0 même si elle n'est pas visible
-                    Notification.show("vous postulez sur l'offre N° "+ligne.get(0) + " proposée par " + ligne.get(1));
-                }
-            });
 
-            this.add(this.bPostule);
-*/
-            //this.add(new H3("Offres regroupées de nos partenaires"));
             PreparedStatement offresParPartenaire = con.prepareStatement(
-            "select partenaire.id,partenaire.refPartenaire,sum(offremobilite.nbrplaces) as placesPartenaire, ( \n"
-                    + "   select sum(nbrplaces) from offremobilite \n"
-                    + "  ) as totplaces \n"
+            "select partenaire.id,partenaire.refPartenaire,sum(offremobilite.nbrplaces) as placesPartenaire, \n"
+                    + "       group_concat(distinct offremobilite.semestre separator ', ') as semestres, \n"
+                    + "       group_concat(distinct offremobilite.nomdispositif separator ', ') as dispositifs, \n"
+                    + "       group_concat(distinct offremobilite.specialite separator ', ') as specialites, \n"
+                    + "       (select sum(nbrplaces) from offremobilite) as totplaces \n"
                     + "  from offremobilite \n"
                     + "    join partenaire on offremobilite.proposepar = partenaire.id \n"
                     + "  group by partenaire.id");
-            //this.add(new ResultSetGrid(offresParPartenaire));
+
             this.add(new H3("Offres regroupées de nos partenaires"));
             ResultSetGrid parPart = new ResultSetGrid(offresParPartenaire, new GridDescription(List.of(
                     new ColumnDescription().colData(0).visible(false), // on veut pouvoir accéder à l'id du partenaire mais non l'afficher
                     new ColumnDescription().colData(1).headerString("Partenaire"),
                     new ColumnDescription().colData(2).headerString("Places totales"),
-                    // calcul du pourcentage
-                    // Note : le type précis de donnée retourné par un opérateur sum n'est pas forcément un Integer
-                    // c'est pourquoi on n'utilise pas un simple cast : (Integer) t.get(2)
-                    // mais on passe plutôt par la forme textuelle : Integer.parseInt(""+t.get(2))
+                    new ColumnDescription().colData(3).headerString("Semestres"),
+                    new ColumnDescription().colData(4).headerString("Dispositifs"),
+                    new ColumnDescription().colData(5).headerString("Spécialités"),
                     new ColumnDescription().colCalculatedObject((t) -> {
-                        int nbrPart = Integer.parseInt(""+t.get(2));
-                        int nbrTot = Integer.parseInt(""+t.get(3));
+                        int nbrPart = Integer.parseInt("" + t.get(2));
+                        int nbrTot = Integer.parseInt("" + t.get(6));
                         double percent = ((double) nbrPart) / nbrTot * 100;
                         return String.format("%.0f%%", percent);
                     }).headerString("En pourcentage")
@@ -144,3 +115,4 @@ public class OffresPanel extends VerticalLayout {
     }
 
 }
+
