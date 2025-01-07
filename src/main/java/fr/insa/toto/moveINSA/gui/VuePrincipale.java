@@ -39,7 +39,6 @@ import java.util.List;
 public class VuePrincipale extends VerticalLayout {
 
     public VuePrincipale() {
-        // Uniformiser la police et les couleurs principales
         this.getStyle().set("font-family", "'Roboto', sans-serif")
                 .set("background", "linear-gradient(to bottom, #ffffff, #f5f5f5)")
                 .set("color", "#333");
@@ -63,7 +62,7 @@ public class VuePrincipale extends VerticalLayout {
         this.add(titre);
         attention.forEach(this::add);
 
-        // Ajout de la phrase avec le lien
+        // ajout phrase avec lien
         Paragraph infoParagraph = new Paragraph();
         infoParagraph.setText("Vous trouverez ");
 
@@ -78,7 +77,7 @@ public class VuePrincipale extends VerticalLayout {
 
         this.add(infoParagraph);
 
-        // Ajout d'un "carrousel" manuel avec des boutons pour faire défiler les images
+        // pour faire défiler les images (carousel)
 HorizontalLayout imageCarousel = new HorizontalLayout();
 imageCarousel.setWidthFull();
 imageCarousel.setJustifyContentMode(JustifyContentMode.CENTER);
@@ -89,24 +88,24 @@ imageCarousel.getStyle()
         .set("box-shadow", "0 4px 12px rgba(0,0,0,0.2)")
         .set("margin-bottom", "30px");
 
-// Images pour le "carrousel"
+// image du carousel
 Image image1 = image("insa1.jpg");
 Image image2 = image("insa2.jpg");
 Image image3 = image("insa3.jpg");
 
-// Conteneur pour l'image active
+// image activ e
 Div imageContainer = new Div(image1);
 imageContainer.setWidth("400px");
 imageContainer.getStyle().set("text-align", "center").set("overflow", "hidden");
 
-// Boutons pour naviguer entre les images
+// boutons pour navig images
 Icon prevButton = VaadinIcon.ANGLE_LEFT.create();
 prevButton.getStyle().set("cursor", "pointer").set("color", "#d50000").set("font-size", "24px");
 
 Icon nextButton = VaadinIcon.ANGLE_RIGHT.create();
 nextButton.getStyle().set("cursor", "pointer").set("color", "#d50000").set("font-size", "24px");
 
-// Logique pour changer les images
+// pour changer images
 Image[] images = {image1, image2, image3};
 int[] currentIndex = {0};
 prevButton.addClickListener(e -> {
@@ -120,12 +119,11 @@ nextButton.addClickListener(e -> {
     imageContainer.add(images[currentIndex[0]]);
 });
 
-// Ajouter les éléments au "carrousel"
 imageCarousel.add(prevButton, imageContainer, nextButton);
 this.add(imageCarousel);
 
 
-        // Ajout des statistiques avec style et icônes
+        // ajout des stats avec style
         HorizontalLayout statsLayout = new HorizontalLayout();
         statsLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         statsLayout.getStyle()
@@ -136,10 +134,10 @@ this.add(imageCarousel);
                 .set("box-shadow", "0 4px 12px rgba(0,0,0,0.1)")
                 .set("align-self", "center");
 
-        statsLayout.add(createStatWithIcon("Pays", "39", VaadinIcon.GLOBE));
-        statsLayout.add(createStatWithIcon("Accords", "230", VaadinIcon.HANDSHAKE));
-        statsLayout.add(createStatWithIcon("Programmes", "50", VaadinIcon.BOOK));
-        statsLayout.add(createStatWithIcon("Partenaires internationaux", ">120", VaadinIcon.GROUP));
+        statsLayout.add(icon("Pays", "39", VaadinIcon.GLOBE));
+        statsLayout.add(icon("Accords", "230", VaadinIcon.HANDSHAKE));
+        statsLayout.add(icon("Programmes", "50", VaadinIcon.BOOK));
+        statsLayout.add(icon("Partenaires internationaux", ">120", VaadinIcon.GROUP));
 
         this.add(statsLayout);
 
@@ -165,7 +163,7 @@ this.add(imageCarousel);
         this.add(footer);
     }
 
-    private Div createStatWithIcon(String title, String value, VaadinIcon iconType) {
+    private Div icon(String title, String value, VaadinIcon iconType) {
         Div stat = new Div();
         stat.getStyle()
                 .set("text-align", "center")

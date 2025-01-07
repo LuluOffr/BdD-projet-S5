@@ -26,13 +26,16 @@ import fr.insa.toto.moveINSA.gui.vues.CandidatureListePanel;
 public class MenuGauche extends SideNav {
 
     public MenuGauche() {
-        // Ajout de styles globaux au conteneur principal
+        
+/*
+// style pour menu gauche
         this.getStyle()
             .set("width", "250px")
             .set("background-color", "#f8f9fa")
             .set("box-shadow", "2px 0 8px rgba(0, 0, 0, 0.1)")
             .set("border-radius", "8px")
             .set("padding", "10px");
+*/
 
         // Menu principal
         SideNavItem main = new SideNavItem("Menu", VuePrincipale.class);
@@ -57,13 +60,13 @@ public class MenuGauche extends SideNav {
         SideNavItem gmec = new SideNavItem("Mécanique");
 
         // Classes pour Génie civil et topographie
-        addClassesToDepartment(gcivil, new String[]{"GC2", "GC3", "GC4", "GC5", "G2", "G3", "G4", "G5"});
+        classeDep(gcivil, new String[]{"GC2", "GC3", "GC4", "GC5", "G2", "G3", "G4", "G5"});
 
         // Classes pour Génie électrique et énergétique
-        addClassesToDepartment(gelec, new String[]{"GE2", "GE3", "GE4", "GE5", "GTEE2", "GTEE3", "GTEE4", "GTEE5"});
+        classeDep(gelec, new String[]{"GE2", "GE3", "GE4", "GE5", "GTEE2", "GTEE3", "GTEE4", "GTEE5"});
 
         // Classes pour Mécanique
-        addClassesToDepartment(gmec, new String[]{
+        classeDep(gmec, new String[]{
             "GM2", "GM3", "GM4", "GM5",
             "PL2", "PL3", "PL4", "PL5",
             "MIQ2", "MIQ3", "MIQ4", "MIQ5"
@@ -71,17 +74,17 @@ public class MenuGauche extends SideNav {
 
         departements.addItem(archi, gcivil, gelec, gmec);
 
-        // Menu candidatures
+        // candidatures
         SideNavItem candidature = new SideNavItem("Candidatures");
         candidature.addItem(new SideNavItem("Candidature (ÉTUDIANT)", CandidaturePanel.class));
         candidature.addItem(new SideNavItem("Liste Candidatures (SRI)", CandidatureListePanel.class));
 
-        // Menu attributions
+        //attributions
         SideNavItem attribution = new SideNavItem("Attributions");
         attribution.addItem(new SideNavItem("Attribution (SRI)", AttributionSRI.class));
         attribution.addItem(new SideNavItem("Attribution (ÉTUDIANT)", AttributionEtudiant.class));
 
-        // Menu debug
+        // debug
         SideNavItem debug = new SideNavItem("Debug");
         debug.addItem(new SideNavItem("Test Driver", TestDriverPanel.class));
         debug.addItem(new SideNavItem("RAZ BdD", RAZBdDPanel.class));
@@ -89,17 +92,12 @@ public class MenuGauche extends SideNav {
         debug.addItem(new SideNavItem("Test DataGrid", TestDataGrid.class));
         debug.addItem(new SideNavItem("Test Grid direct", TestGridDirect.class));
 
-        // Ajout final
+        //final
         this.addItem(main, departements, partenaires, offres, candidature, attribution, debug);
     }
-
-    /**
-     * Ajoute des classes à un département avec un sous-menu pour les étudiants.
-     *
-     * @param departmentMenu Menu du département.
-     * @param classNames     Noms des classes à ajouter.
-     */
-    private void addClassesToDepartment(SideNavItem departmentMenu, String[] classNames) {
+    
+    
+    private void classeDep(SideNavItem departmentMenu, String[] classNames) {
         for (String className : classNames) {
             SideNavItem classItem = new SideNavItem(className);
             SideNavItem etudiants = new SideNavItem("Étudiants");

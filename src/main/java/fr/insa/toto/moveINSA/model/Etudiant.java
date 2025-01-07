@@ -87,6 +87,8 @@ public static List<Etudiant> tousLesEtudiants(Connection con) throws SQLExceptio
         return etudiants;
     }
 }
+
+
 public static List<Etudiant> tousLesEtudiantsParClasse(Connection con, String classe) throws SQLException {
     List<Etudiant> etudiants = new ArrayList<>();
     String query = "SELECT * FROM " + classe;
