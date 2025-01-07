@@ -95,7 +95,6 @@ public class CandidaturePanel extends VerticalLayout {
     }
 });
 
-        // Ajouter les champs et le bouton au panneau
         this.add(ineField, validerINE);
     }
 
@@ -111,13 +110,12 @@ public class CandidaturePanel extends VerticalLayout {
 
         choixPartenaires = new ArrayList<>();
         for (int i = 1; i <= 5; i++) {
-            // Capturer l'index `i` dans une variable finale pour l'utiliser dans une lambda
             final int ordre = i;
 
             ComboBox<OffreMobilite> comboBox = new ComboBox<>("Établissement choisi n°" + ordre);
             comboBox.setItems(offres);
 
-            // Générer les libellés des offres
+            // génère les offres
             comboBox.setItemLabelGenerator(offre -> {
                 try (Connection localCon = ConnectionPool.getConnection()) {
                     Partenaire partenaire = offre.getPartenaire(localCon)

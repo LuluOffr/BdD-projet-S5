@@ -80,7 +80,7 @@ public class CandidatureListePanel extends VerticalLayout {
             try (Connection con = ConnectionPool.getConnection()) {
                 List<Candidature> candidatures = Candidature.toutesLesCandidatures(con);
 
-                // Enrichir les candidatures avec les informations des étudiants
+                // affiche diverses infos sur l'étudiant
                 List<CandidatureAvecEtudiant> candidaturesAvecEtudiant = new ArrayList<>();
                 for (Candidature candidature : candidatures) {
                     Optional<Etudiant> etudiantOpt = Etudiant.trouveEtudiant(con, candidature.getIne());

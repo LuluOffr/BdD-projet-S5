@@ -61,7 +61,7 @@ public class PartenaireForm extends FormLayout {
             }
         });
 
-        // Ajout 
+        // ajout si bon mdp 
         this.tfRefPartenaire.addValueChangeListener(event -> mdpgenere());
         this.add(this.tfRefPartenaire, this.tfPays, this.tfNom, this.tfVille, this.generatedPasswordLabel);
 

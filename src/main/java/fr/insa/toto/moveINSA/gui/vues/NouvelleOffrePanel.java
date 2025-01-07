@@ -60,7 +60,7 @@ public class NouvelleOffrePanel extends VerticalLayout {
         this.tfSpecialite.setEnabled(false);
         this.bSave = new Button("Sauvegarder");
 
-        // Vérifier le mot de passe avant d'afficher la suite
+        // verif mdp
         this.cbPartenaire.addValueChangeListener(event -> {
             Partenaire selected = this.cbPartenaire.getValue();
             if (selected != null) {
@@ -99,7 +99,7 @@ public class NouvelleOffrePanel extends VerticalLayout {
             }
         });
 
-        // Sauvegarder la nouvelle offre
+        // sauv la nouvelle offre
         this.bSave.addClickListener((t) -> {
             Partenaire selected = this.cbPartenaire.getValue();
             if (selected == null) {

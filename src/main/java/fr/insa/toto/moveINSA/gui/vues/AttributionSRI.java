@@ -41,6 +41,11 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ *
+ * @author lucas
+ */
+
 @PageTitle("Attribution des candidatures (SRI)")
 @Route(value = "attributions/sri", layout = MainLayout.class)
 public class AttributionSRI extends VerticalLayout {
@@ -127,7 +132,7 @@ public class AttributionSRI extends VerticalLayout {
         grid.addColumn(Candidature::getDate).setHeader("Date");
         grid.addColumn(Candidature::getStatut).setHeader("Statut");
 
-        // Ajouter une colonne pour afficher les places disponibles
+        // colonne pour place disponible
         grid.addColumn(candidature -> {
             try (Connection localCon = ConnectionPool.getConnection()) {
                 return getPlacesDisponibles(localCon, candidature.getIdOffreMobilité());
@@ -137,36 +142,35 @@ public class AttributionSRI extends VerticalLayout {
             }
         }).setHeader("Places Disponibles");
 
-        // Ajouter les boutons Accepter et Refuser
         grid.addComponentColumn(candidature -> {
             Button accepterButton = new Button("Accepter");
             Button refuserButton = new Button("Refuser");
 
-            // Gestion de l'action "Accepter"
+            // gestion quand on "accepte"
             accepterButton.addClickListener(event -> {
                 try (Connection localCon = ConnectionPool.getConnection()) {
                     traiterCandidature(localCon, candidature, "ACCEPTE");
-                    accepterButton.setEnabled(false); // Désactiver le bouton après clic
-                    refuserButton.setEnabled(false);  // Désactiver également le bouton Refuser
+                    accepterButton.setEnabled(false); 
+                    refuserButton.setEnabled(false);  //desactiv le bouton apres clic
                 } catch (SQLException ex) {
                     Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
                     ex.printStackTrace();
                 }
             });
 
-            // Gestion de l'action "Refuser"
+            // gestion refuser
             refuserButton.addClickListener(event -> {
                 try (Connection localCon = ConnectionPool.getConnection()) {
                     traiterCandidature(localCon, candidature, "REFUSE");
-                    accepterButton.setEnabled(false); // Désactiver le bouton après clic
-                    refuserButton.setEnabled(false);  // Désactiver également le bouton Accepter
+                    accepterButton.setEnabled(false);
+                    refuserButton.setEnabled(false);  
                 } catch (SQLException ex) {
                     Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
                     ex.printStackTrace();
                 }
             });
 
-            // Désactiver les boutons si le statut est déjà défini
+            // desactive les boutons si le statut est déjà défini
             if (!"ATTENTE".equalsIgnoreCase(candidature.getStatut())) {
                 accepterButton.setEnabled(false);
                 refuserButton.setEnabled(false);
@@ -185,11 +189,11 @@ public class AttributionSRI extends VerticalLayout {
 
     private void traiterCandidature(Connection con, Candidature candidature, String statut) {
         try {
-            // Mettre à jour le statut de la candidature
+            // maj la candidature
             Candidature.mettreAJourStatut(con, candidature.getIne(), candidature.getOrdre(), statut);
 
             if ("ACCEPTE".equalsIgnoreCase(statut)) {
-                // Récupérer l'ID du partenaire associé à l'offre de mobilité
+                // récupère l'id du partenaire associé à l'offre de mobilité
                 String queryPartenaire = """
                     SELECT partenaire.id AS idPartenaire
                     FROM partenaire
@@ -210,7 +214,7 @@ public class AttributionSRI extends VerticalLayout {
                     }
                 }
 
-                // Réduire le nombre de places pour ce partenaire
+                // reduit le nombre de place pour le partenaire choisi
                 String queryUpdatePlaces = "UPDATE offremobilite SET nbrplaces = nbrplaces - 1 WHERE proposepar = ? AND nbrplaces > 0";
                 try (PreparedStatement pst = con.prepareStatement(queryUpdatePlaces)) {
                     pst.setInt(1, partenaireId);
@@ -243,7 +247,7 @@ public class AttributionSRI extends VerticalLayout {
     """;
 
     try (PreparedStatement pst = con.prepareStatement(query)) {
-        pst.setString(1, refPartenaire); // Récupère les places disponibles pour le partenaire
+        pst.setString(1, refPartenaire); // recup les places disponibles pour le partenaire
         try (ResultSet rs = pst.executeQuery()) {
             if (rs.next()) {
                 int places = rs.getInt("placesDisponibles");

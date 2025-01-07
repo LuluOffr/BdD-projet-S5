@@ -80,7 +80,7 @@ public class EtudiantCreationPanel extends VerticalLayout implements BeforeEnter
     }
  @Override
     public void beforeEnter(BeforeEnterEvent event) {
-        // Extraire le paramètre 'className' de l'URL
+        // extrait le paramètre 'className' de l'URL
         this.classeSelectionnee = event.getRouteParameters().get("classeSelectionnee").orElse("Aucune classe");
         // affiche étudiants pour la classe sélectionnée
         showCreationForm(classeSelectionnee);
