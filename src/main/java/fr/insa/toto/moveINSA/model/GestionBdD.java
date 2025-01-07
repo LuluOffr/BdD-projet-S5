@@ -96,7 +96,6 @@ public class GestionBdD {
                 st.executeUpdate(
                         "alter table offremobilite drop constraint fk_offremobilite_proposepar");
             } catch (SQLException ex) {
-                // nothing to do : maybe the constraint was not created
             }
             // je peux maintenant supprimer les tables
             try {
