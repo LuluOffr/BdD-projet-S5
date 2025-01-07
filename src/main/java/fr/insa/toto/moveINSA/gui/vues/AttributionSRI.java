@@ -35,24 +35,20 @@ import fr.insa.toto.moveINSA.model.Candidature;
 import fr.insa.toto.moveINSA.model.Etudiant;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * 
- * @author lucas
- * classe qui gère où le SRI pourra gérer les candidatures des étudiants
- * 
- */
 @PageTitle("Attribution des candidatures (SRI)")
 @Route(value = "attributions/sri", layout = MainLayout.class)
 public class AttributionSRI extends VerticalLayout {
 
-    private static final String PASSWORD = "SRI2024"; 
-    private boolean isAuthenticated = false; 
-    private Etudiant etudiant; 
-    private VerticalLayout contentLayout; 
+    private static final String PASSWORD = "SRI2024";
+    private boolean isAuthenticated = false;
+    private Etudiant etudiant;
+    private VerticalLayout contentLayout;
 
     public AttributionSRI() {
         this.add(new H3("Espace d'attribution des candidatures (SRI)"));
@@ -80,7 +76,6 @@ public class AttributionSRI extends VerticalLayout {
 
         contentLayout.removeAll();
 
-        //recherche étudiant par l'ine
         TextField ineField = new TextField("Entrez l'INE de l'étudiant");
         Button rechercherButton = new Button("Rechercher", event -> {
             String ine = ineField.getValue();
@@ -109,71 +104,156 @@ public class AttributionSRI extends VerticalLayout {
     }
 
     private void afficherProfilEtudiant(Connection con) {
-        contentLayout.removeAll();
+    contentLayout.removeAll();
 
-        //affiche infos de l'etudiant
-        contentLayout.add(new H3("Profil de l'étudiant :"));
-        contentLayout.add(new Paragraph("Nom : " + etudiant.getNom()));
-        contentLayout.add(new Paragraph("Prénom : " + etudiant.getPrenom()));
-        contentLayout.add(new Paragraph("Classe : " + etudiant.getClasse()));
+    contentLayout.add(new H3("Profil de l'étudiant :"));
+    contentLayout.add(new Paragraph("Nom : " + etudiant.getNom()));
+    contentLayout.add(new Paragraph("Prénom : " + etudiant.getPrenom()));
+    contentLayout.add(new Paragraph("Classe : " + etudiant.getClasse()));
 
-        try {
-            //recup les candidatures de l'étudiant
-            List<Candidature> candidatures = Candidature.trouverCandidaturesParEtudiant(con, etudiant.getIne());
-            if (candidatures.isEmpty()) {
-                contentLayout.add(new Paragraph("Aucune candidature trouvée pour cet étudiant."));
-                return;
+    try {
+        List<Candidature> candidatures = Candidature.trouverCandidaturesParEtudiant(con, etudiant.getIne());
+        if (candidatures.isEmpty()) {
+            contentLayout.add(new Paragraph("Aucune candidature trouvée pour cet étudiant."));
+            return;
+        }
+
+        contentLayout.add(new H3("Candidatures de l'étudiant :"));
+
+        Grid<Candidature> grid = new Grid<>(Candidature.class, false);
+
+        grid.addColumn(Candidature::getIdOffreMobilité).setHeader("Établissement demandé");
+        grid.addColumn(Candidature::getOrdre).setHeader("Ordre");
+        grid.addColumn(Candidature::getDate).setHeader("Date");
+        grid.addColumn(Candidature::getStatut).setHeader("Statut");
+
+        // Ajouter une colonne pour afficher les places disponibles
+        grid.addColumn(candidature -> {
+            try (Connection localCon = ConnectionPool.getConnection()) {
+                return getPlacesDisponibles(localCon, candidature.getIdOffreMobilité());
+            } catch (SQLException e) {
+                e.printStackTrace();
+                return "Erreur";
+            }
+        }).setHeader("Places Disponibles");
+
+        // Ajouter les boutons Accepter et Refuser
+        grid.addComponentColumn(candidature -> {
+            Button accepterButton = new Button("Accepter");
+            Button refuserButton = new Button("Refuser");
+
+            // Gestion de l'action "Accepter"
+            accepterButton.addClickListener(event -> {
+                try (Connection localCon = ConnectionPool.getConnection()) {
+                    traiterCandidature(localCon, candidature, "ACCEPTE");
+                    accepterButton.setEnabled(false); // Désactiver le bouton après clic
+                    refuserButton.setEnabled(false);  // Désactiver également le bouton Refuser
+                } catch (SQLException ex) {
+                    Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
+                    ex.printStackTrace();
+                }
+            });
+
+            // Gestion de l'action "Refuser"
+            refuserButton.addClickListener(event -> {
+                try (Connection localCon = ConnectionPool.getConnection()) {
+                    traiterCandidature(localCon, candidature, "REFUSE");
+                    accepterButton.setEnabled(false); // Désactiver le bouton après clic
+                    refuserButton.setEnabled(false);  // Désactiver également le bouton Accepter
+                } catch (SQLException ex) {
+                    Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
+                    ex.printStackTrace();
+                }
+            });
+
+            // Désactiver les boutons si le statut est déjà défini
+            if (!"ATTENTE".equalsIgnoreCase(candidature.getStatut())) {
+                accepterButton.setEnabled(false);
+                refuserButton.setEnabled(false);
             }
 
-            contentLayout.add(new H3("Candidatures de l'étudiant :"));
+            return new HorizontalLayout(accepterButton, refuserButton);
+        }).setHeader("Actions");
 
-            //grille
-            Grid<Candidature> grid = new Grid<>(Candidature.class, false);
-
-            grid.addColumn(Candidature::getIdOffreMobilité).setHeader("Établissement demandé");
-            grid.addColumn(Candidature::getOrdre).setHeader("Ordre");
-            grid.addColumn(Candidature::getDate).setHeader("Date");
-            grid.addColumn(Candidature::getStatut).setHeader("Statut");
-
-            // "accepter'' et "refuser" pour chaque boutton
-            grid.addComponentColumn(candidature -> {
-                Button accepterButton = new Button("Accepter", event -> {
-    try (Connection localCon = ConnectionPool.getConnection()) {
-        traiterCandidature(localCon, candidature, "ACCEPTE");
+        grid.setItems(candidatures);
+        contentLayout.add(grid);
     } catch (SQLException ex) {
-        Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
+        Notification.show("Erreur lors du chargement des candidatures : " + ex.getLocalizedMessage());
         ex.printStackTrace();
     }
-});
+}
 
-Button refuserButton = new Button("Refuser", event -> {
-    try (Connection localCon = ConnectionPool.getConnection()) {
-        traiterCandidature(localCon, candidature, "REFUSE");
-    } catch (SQLException ex) {
-        Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
-        ex.printStackTrace();
-    }
-});
-                return new HorizontalLayout(accepterButton, refuserButton);
-            }).setHeader("Actions");
+    private void traiterCandidature(Connection con, Candidature candidature, String statut) {
+        try {
+            // Mettre à jour le statut de la candidature
+            Candidature.mettreAJourStatut(con, candidature.getIne(), candidature.getOrdre(), statut);
 
-            grid.setItems(candidatures);
-            contentLayout.add(grid);
+            if ("ACCEPTE".equalsIgnoreCase(statut)) {
+                // Récupérer l'ID du partenaire associé à l'offre de mobilité
+                String queryPartenaire = """
+                    SELECT partenaire.id AS idPartenaire
+                    FROM partenaire
+                    JOIN offremobilite ON partenaire.id = offremobilite.proposepar
+                    WHERE partenaire.refPartenaire = ?
+                """;
+
+                int partenaireId = -1;
+                try (PreparedStatement pst = con.prepareStatement(queryPartenaire)) {
+                    pst.setString(1, candidature.getIdOffreMobilité()); // Ici, `refPartenaire` est utilisé
+                    try (ResultSet rs = pst.executeQuery()) {
+                        if (rs.next()) {
+                            partenaireId = rs.getInt("idPartenaire");
+                        } else {
+                            Notification.show("Erreur : Partenaire introuvable pour cette candidature.");
+                            return;
+                        }
+                    }
+                }
+
+                // Réduire le nombre de places pour ce partenaire
+                String queryUpdatePlaces = "UPDATE offremobilite SET nbrplaces = nbrplaces - 1 WHERE proposepar = ? AND nbrplaces > 0";
+                try (PreparedStatement pst = con.prepareStatement(queryUpdatePlaces)) {
+                    pst.setInt(1, partenaireId);
+                    int rowsUpdated = pst.executeUpdate();
+
+                    if (rowsUpdated > 0) {
+                        Notification.show("Une place a été retirée pour le partenaire.");
+                    } else {
+                        Notification.show("Aucune place disponible pour ce partenaire.");
+                    }
+                }
+            } else if ("REFUSE".equalsIgnoreCase(statut)) {
+                Notification.show("Aucune place n'a été modifiée pour ce partenaire.");
+            }
+
+            afficherProfilEtudiant(con);
+
         } catch (SQLException ex) {
-            Notification.show("Erreur lors du chargement des candidatures : " + ex.getLocalizedMessage());
+            Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
             ex.printStackTrace();
         }
     }
 
-    private void traiterCandidature(Connection con, Candidature candidature, String statut) {
-    try {
-        //maj du statut dans la base de données
-        Candidature.mettreAJourStatut(con, candidature.getIne(), candidature.getOrdre(), statut);
-        Notification.show("La candidature pour l'établissement " + candidature.getIdOffreMobilité() + " a été " + statut.toLowerCase() + ".");
-        afficherProfilEtudiant(con); 
-    } catch (SQLException ex) {
-        Notification.show("Erreur lors du traitement de la candidature : " + ex.getLocalizedMessage());
-        ex.printStackTrace();
+    private String getPlacesDisponibles(Connection con, String refPartenaire) {
+    String query = """
+        SELECT SUM(offremobilite.nbrplaces) AS placesDisponibles
+        FROM offremobilite
+        JOIN partenaire ON offremobilite.proposepar = partenaire.id
+        WHERE partenaire.refPartenaire = ?
+    """;
+
+    try (PreparedStatement pst = con.prepareStatement(query)) {
+        pst.setString(1, refPartenaire); // Récupère les places disponibles pour le partenaire
+        try (ResultSet rs = pst.executeQuery()) {
+            if (rs.next()) {
+                int places = rs.getInt("placesDisponibles");
+                return places + " places";
+            }
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return "erreur SQL";
     }
+    return "Indisponible";
 }
 }

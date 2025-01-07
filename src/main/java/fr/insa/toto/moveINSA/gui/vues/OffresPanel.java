@@ -89,7 +89,7 @@ public class OffresPanel extends VerticalLayout {
             )));
 
             this.add(new H3("Liste des toutes les offres que proposent nos partenaires "));
-            this.add(new Paragraph("Pour plus de détails, veuillez directement consulter le site web de l'univesrité partenaire"));
+            this.add(new Paragraph("Pour plus de détails, veuillez directement consulter le site web de l'université partenaire"));
             this.add(this.gOffres);
             /*
             this.bPostule = new Button("Postuler");
