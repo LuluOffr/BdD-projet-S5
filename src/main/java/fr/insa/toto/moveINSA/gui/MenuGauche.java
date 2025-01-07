@@ -39,137 +39,135 @@ import fr.insa.toto.moveINSA.gui.vues.AttributionEtudiant;
 import fr.insa.toto.moveINSA.gui.vues.CandidatureListePanel;
 
 /**
- *
- * @author francois
+ * Classe MenuGauche pour la gestion du menu latéral avec styles intégrés.
  */
 public class MenuGauche extends SideNav {
 
     public MenuGauche() {
+        // Ajout de styles globaux au conteneur principal
+        this.getStyle()
+            .set("width", "250px")
+            .set("background-color", "#f8f9fa")
+            .set("box-shadow", "2px 0 8px rgba(0, 0, 0, 0.1)")
+            .set("border-radius", "8px")
+            .set("padding", "10px");
+
         // Menu principal
         SideNavItem main = new SideNavItem("Menu", VuePrincipale.class);
+        styleMenuItem(main, "#d32f2f", "18px", "bold", null);
 
         // Menu partenaires
-        SideNavItem partenaires = new SideNavItem("partenaires");
-        partenaires.addItem(new SideNavItem("liste", PartenairesPanel.class));
-        partenaires.addItem(new SideNavItem("nouveau (PARTENAIRE)", NouveauPartenairePanel.class));
-        
+        SideNavItem partenaires = new SideNavItem("Partenaires");
+        styleMenuSection(partenaires, "#3f51b5");
+        partenaires.addItem(new SideNavItem("Liste", PartenairesPanel.class));
+        partenaires.addItem(new SideNavItem("Nouveau (PARTENAIRE)", NouveauPartenairePanel.class));
+
         // Menu offres
-        SideNavItem offres = new SideNavItem("offres");
-        offres.addItem(new SideNavItem("liste", OffresPanel.class));
-        offres.addItem(new SideNavItem("nouvelle (PARTENAIRE)", NouvelleOffrePanel.class));
+        SideNavItem offres = new SideNavItem("Offres");
+        styleMenuSection(offres, "#3f51b5");
+        offres.addItem(new SideNavItem("Liste", OffresPanel.class));
+        offres.addItem(new SideNavItem("Nouvelle (PARTENAIRE)", NouvelleOffrePanel.class));
 
-        // Menu Département
-        
+        // Menu départements
         SideNavItem departements = new SideNavItem("Départements");
+        styleMenuSection(departements, "#3f51b5");
 
-        // Ajouter des sous-onglets pour chaque departement
+        // Sous-menus pour chaque département
         SideNavItem archi = new SideNavItem("Département Architecture");
         SideNavItem gcivil = new SideNavItem("Génie civil et topographie");
-        // Onglet Classe
-        SideNavItem classes = new SideNavItem("Classes");
-
-        // Ajouter des sous-onglets pour chaque classe
-        String[] gcclassNames = {
-            "GC2", "GC3", "GC4", "GC5",
-            "G2", "G3", "G4", "G5"
-        };
-
-        for (String className : gcclassNames) {
-            // Ajouter un sous-menu pour chaque classe
-            SideNavItem classItem = new SideNavItem(className);
-
-            // Menu étudiants
-        SideNavItem etudiants = new SideNavItem("étudiants");
-        etudiants.addItem(new SideNavItem("liste (SRI)", "etudiants/liste/"+ className)); 
-        etudiants.addItem(new SideNavItem("nouveau (SRI)", "etudiants/nouveau/"+ className));
-        classItem.addItem(etudiants);
-            // Ajouter ce sous-menu à l'onglet "Classes"
-            classes.addItem(classItem);
-            gcivil.addItem(classItem);
-        }
-        SideNavItem gelec = new SideNavItem("Génie électrique et énergetique");
-        // Onglet Classe
-        gelec.addItem(classes);
-
-        // Ajouter des sous-onglets pour chaque classe
-        String[] geclassNames = {
-            "GE2", "GE3", "GE4", "GE5",
-            "GTEE2", "GTEE3", "GTEE4", "GTEE5"
-        };
-
-        for (String className : geclassNames) {
-            // Ajouter un sous-menu pour chaque classe
-            SideNavItem classItem = new SideNavItem(className);
-
-            // Menu étudiants
-        SideNavItem etudiants = new SideNavItem("étudiants");
-        etudiants.addItem(new SideNavItem("liste (SRI)", "etudiants/liste/"+ className)); 
-        etudiants.addItem(new SideNavItem("nouveau (SRI)", "etudiants/nouveau/"+ className));
-        classItem.addItem(etudiants);
-            // Ajouter ce sous-menu à l'onglet "Classes"
-            classes.addItem(classItem);
-            gelec.addItem(classItem);
-        }   
+        SideNavItem gelec = new SideNavItem("Génie électrique et énergétique");
         SideNavItem gmec = new SideNavItem("Mécanique");
-        // Onglet Classe
-        gmec.addItem(classes);
 
-        // Ajouter des sous-onglets pour chaque classe
-        String[] gmclassNames = {
-            "GM2", "GM3", "GM4", "GM5",
-            "PL2", "PL3", "PL4", "PL5",
-            "MIQ2", "MIQ3", "MIQ4", "MIQ5"
-        };
+        // Ajout des sous-menus pour les départements
+        addClassesToDepartment(gcivil, new String[]{"GC2", "GC3", "GC4", "GC5"});
+        addClassesToDepartment(gelec, new String[]{"GE2", "GE3", "GE4", "GE5"});
+        addClassesToDepartment(gmec, new String[]{"GM2", "GM3", "GM4", "GM5"});
 
-        for (String className : gmclassNames) {
-            // Ajouter un sous-menu pour chaque classe
-            SideNavItem classItem = new SideNavItem(className);
+        departements.addItem(archi, gcivil, gelec, gmec);
 
-            // Menu étudiants
-        SideNavItem etudiants = new SideNavItem("étudiants");
-        etudiants.addItem(new SideNavItem("liste (SRI)", "etudiants/liste/"+ className)); 
-        etudiants.addItem(new SideNavItem("nouveau (SRI)", "etudiants/nouveau/"+ className));
-        classItem.addItem(etudiants);
-            // Ajouter ce sous-menu à l'onglet "Classes"
-            classes.addItem(classItem);
-            gmec.addItem(classItem);
-        }   
-        
-        departements.addItem(archi,gcivil,gelec,gmec);
+        // Menu candidatures
+        SideNavItem candidature = new SideNavItem("Candidatures");
+        styleMenuSection(candidature, "#3f51b5");
+        candidature.addItem(new SideNavItem("Candidature (ÉTUDIANT)", CandidaturePanel.class));
+        candidature.addItem(new SideNavItem("Liste Candidatures (SRI)", CandidatureListePanel.class));
 
-        
-        
-         
-        
-        //Menu candidature
-        SideNavItem candidature = new SideNavItem("candidature");
-        candidature.addItem(new SideNavItem("Candidature (ETUDIANT)", CandidaturePanel.class));
-        candidature.addItem(new SideNavItem("Liste Candidature (SRI)", CandidatureListePanel.class));
-        
-        
-        // Menu attribution
-        SideNavItem attribution = new SideNavItem("attribution");
-        attribution.addItem(new SideNavItem("attribution (SRI)", AttributionSRI.class)); 
-        attribution.addItem(new SideNavItem("attribution (ETUDIANT)", AttributionEtudiant.class)); 
-
-        
-        //Menu candidature
-        //SideNavItem Candidature = new SideNavItem("Candidature (ETUDIANT)");
+        // Menu attributions
+        SideNavItem attribution = new SideNavItem("Attributions");
+        styleMenuSection(attribution, "#3f51b5");
+        attribution.addItem(new SideNavItem("Attribution (SRI)", AttributionSRI.class));
+        attribution.addItem(new SideNavItem("Attribution (ÉTUDIANT)", AttributionEtudiant.class));
 
         // Menu debug
-        SideNavItem debug = new SideNavItem("debug");
-        debug.addItem(new SideNavItem("test driver", TestDriverPanel.class));
-        debug.addItem(new SideNavItem("raz BdD", RAZBdDPanel.class));
-        debug.addItem(new SideNavItem("test ResultSetGrid", TestResultSetGrid.class));
-        debug.addItem(new SideNavItem("test DataGrid", TestDataGrid.class));
-        debug.addItem(new SideNavItem("test Grid direct", TestGridDirect.class));
+        SideNavItem debug = new SideNavItem("Debug");
+        styleMenuSection(debug, "#ff5722");
+        debug.addItem(new SideNavItem("Test Driver", TestDriverPanel.class));
+        debug.addItem(new SideNavItem("RAZ BdD", RAZBdDPanel.class));
 
-        // Menu jeux
-        SideNavItem jeux = new SideNavItem("jeux");
-        jeux.addItem(new SideNavItem("boite à coucou", BoiteACoucou.class));
-        jeux.addItem(new SideNavItem("trouve", TrouveEntier.class));
+        // Ajout final
+        this.addItem(main, departements, partenaires, offres, candidature, attribution, debug);
+    }
 
-        // Ajout de tous les menus
-        this.addItem(main, departements,partenaires, offres,  candidature , attribution, debug); // , jeux   (que j'ai enlevé car rien a faire dans ptrojet final)
+    /**
+     * Ajoute des classes à un département avec un sous-menu pour les étudiants.
+     *
+     * @param departmentMenu Menu du département.
+     * @param classNames     Noms des classes à ajouter.
+     */
+    private void addClassesToDepartment(SideNavItem departmentMenu, String[] classNames) {
+        for (String className : classNames) {
+            SideNavItem classItem = new SideNavItem(className);
+            SideNavItem etudiants = new SideNavItem("Étudiants");
+            etudiants.addItem(new SideNavItem("Liste (SRI)", "etudiants/liste/" + className));
+            etudiants.addItem(new SideNavItem("Nouveau (SRI)", "etudiants/nouveau/" + className));
+            classItem.addItem(etudiants);
+
+            // Ajout de styles aux sous-menus
+            styleSubMenu(classItem);
+            departmentMenu.addItem(classItem);
+        }
+    }
+
+    /**
+     * Applique des styles à une section de menu.
+     *
+     * @param item  L'élément de menu.
+     * @param color La couleur du texte.
+     */
+    private void styleMenuSection(SideNavItem item, String color) {
+        item.getStyle()
+            .set("margin-top", "10px")
+            .set("font-size", "16px")
+            .set("color", color);
+    }
+
+    /**
+     * Applique des styles à un élément de menu.
+     *
+     * @param item       L'élément de menu.
+     * @param color      La couleur du texte.
+     * @param fontSize   La taille de la police.
+     * @param fontWeight Le poids de la police.
+     * @param bgColor    La couleur de fond (null si aucune).
+     */
+    private void styleMenuItem(SideNavItem item, String color, String fontSize, String fontWeight, String bgColor) {
+        item.getStyle()
+            .set("color", color)
+            .set("font-size", fontSize)
+            .set("font-weight", fontWeight);
+        if (bgColor != null) {
+            item.getStyle().set("background-color", bgColor);
+        }
+    }
+
+    /**
+     * Applique des styles à un sous-menu.
+     *
+     * @param item L'élément de sous-menu.
+     */
+    private void styleSubMenu(SideNavItem item) {
+        item.getStyle()
+            .set("padding-left", "20px")
+            .set("transition", "all 0.3s ease-in-out");
     }
 }
+
