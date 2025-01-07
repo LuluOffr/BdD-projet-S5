@@ -250,8 +250,8 @@ public static void menuEtudiant(Connection con) {
                 }
             } else if (rep == j++) {
                 // Créer un nouvel étudiant
-                int id = Etudiant.creeConsole(con);
-                System.out.println("Étudiant créé avec l'ID : " + id);
+                String ine = Etudiant.creeConsole(con);
+                System.out.println("Étudiant créé avec l'INE : " + ine);
             } else if (rep == j++) {
                 // Rechercher un étudiant par INE
                 String ine = ConsoleFdB.entreeString("INE de l'étudiant : ");
