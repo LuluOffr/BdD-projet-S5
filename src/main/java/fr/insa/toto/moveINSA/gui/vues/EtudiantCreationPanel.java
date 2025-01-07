@@ -65,7 +65,7 @@ public class EtudiantCreationPanel extends VerticalLayout implements BeforeEnter
             if (PASSWORD.equals(passwordField.getValue())) {
                 isAuthenticated = true;
                 Notification.show("Accès autorisé !");
-                showCreationForm(classeSelectionnee); //affiche formulaire étudiants
+                montreEtudiant(classeSelectionnee); //affiche formulaire étudiants
             } else {
                 Notification.show("Mot de passe incorrect !", 3000, Notification.Position.MIDDLE);
             }
@@ -83,9 +83,9 @@ public class EtudiantCreationPanel extends VerticalLayout implements BeforeEnter
         // extrait le paramètre 'className' de l'URL
         this.classeSelectionnee = event.getRouteParameters().get("classeSelectionnee").orElse("Aucune classe");
         // affiche étudiants pour la classe sélectionnée
-        showCreationForm(classeSelectionnee);
+        montreEtudiant(classeSelectionnee);
     }
-    private void showCreationForm(String classeSelectionnee) {
+    private void montreEtudiant(String classeSelectionnee) {
     if (isAuthenticated) {
         TextField ineField = new TextField("INE");
         TextField nomField = new TextField("Nom");
